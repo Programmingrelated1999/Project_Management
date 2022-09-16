@@ -1,5 +1,6 @@
 import React from 'react'
 import "./Tasks.css"
+import Card from './Tasks/Card'
 
 const Tasks = () => {
   return (
@@ -8,7 +9,7 @@ const Tasks = () => {
           <p>Calander</p>
         </div>
         <div className = "tasksLog">
-            <p>Tasks</p>
+            <Card />
         </div>
     </div>
   )
