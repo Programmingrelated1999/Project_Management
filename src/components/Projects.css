@@ -1,0 +1,22 @@
+.projects{
+    display: block;
+}
+
+.main-filter{
+    text-align: center;
+    padding: 2rem;
+}
+
+.other-filters{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.other-filters Button{
+    margin: 1rem;
+}
+
+#search-bar{
+    width: 33%;
+}

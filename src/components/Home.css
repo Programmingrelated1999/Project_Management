@@ -1,0 +1,22 @@
+.home-main{
+    display: flex;
+    justify-content: center;
+    margin: 1rem;
+  }
+  
+.home-main button{
+    margin: 1rem;
+}
+
+.calendarAndTask{
+    display: flex;
+    margin: 2rem;
+    justify-content: space-evenly;
+}
+
+.miniTask{
+    width: 25rem;
+    height: 25rem;
+    border: 0.1rem solid black;
+    border-radius: 1rem;
+}
