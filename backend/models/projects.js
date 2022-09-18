@@ -11,10 +11,11 @@ const projectSchema = new mongoose.Schema({
   description:{
     type: String,
   },
-  creators:[{
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-  }],
+    required: true,
+  },
   admin: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -26,7 +27,22 @@ const projectSchema = new mongoose.Schema({
   clients: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-  }]
+  }],
+  tasks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+    }],
+  bugs: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Bug",
+    }],
+  createdDate: {
+      type: Date,
+      required: true,
+  }, 
+  endDate: {
+      type: Date,
+  }
 });
 
 //setSchema

@@ -8,6 +8,13 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    createdDate: {
+        type: Date,
+        required: true,
+    },
+    endDate: {
+        type: Date,
+    },
     description:{
         type: String,
         required: true,
@@ -16,10 +23,11 @@ const taskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     }],
-    project: [{
+    project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project",
-    }],
+        required: true,
+    },
 });
 
 //setSchema

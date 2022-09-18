@@ -6,6 +6,8 @@ const app = express();
 //routers import
 const userRouter = require("./controllers/userRouter");
 const projectRouter = require("./controllers/projectRouter");
+const bugRouter = require("./controllers/bugRouter");
+const taskRouter = require("./controllers/taskRouter");
 
 //cross-origin resource sharing import
 const cors = require("cors");
@@ -33,11 +35,15 @@ app.use(cors());
 //transform all incoming request body into javascript object
 app.use(express.json());
 
-//formsRouter root as /api/forms
+//Routers
+//userRouter root as /api/users
 app.use("/api/users", userRouter);
-
-//questionsRouter root as /api/questions
+//projectRouter root as /api/projects
 app.use("/api/projects", projectRouter);
+//taskRouter root as /api/tasks
+app.use("/api/tasks", taskRouter);
+//bugsRouter root as /api/bugs
+app.use("/api/bugs", bugRouter);
 
 //exports
 module.exports = app;

@@ -9,6 +9,7 @@ userRouter.get("/", (request, response) => {
 })
 
 //POST
+//create a new user only required name.
 userRouter.post("/", (request, response) => {
     const user = new Users({
         name: request.body.name,
