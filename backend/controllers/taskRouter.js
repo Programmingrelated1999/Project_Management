@@ -12,6 +12,13 @@ taskRouter.get("/", (request, response) => {
     });
 });
 
+//GET ONE
+taskRouter.get("/:id", (request, response) => {
+    Tasks.findById(request.params.id).then((task) => {
+        response.json(task);
+    });
+});
+
 //POST 
 //find project who create the project with project id and then create a task with name, description from request body, createdDate as current time and project set to project id
 //save the task into MongoDB then with the returned object's id saved it to project's tasks.
@@ -31,6 +38,24 @@ taskRouter.post("/", async (request, response) => {
     await project.save();
 
     response.json(savedTask);
+})
+
+//DELETE
+//first get the task from link id, then get the project from the task.project. 
+//filter the tasks from project to remove the current task from the list, then saved the project. 
+//remove the task and then return the removedTask information.
+taskRouter.delete("/:id", async (request, response) => {
+    const task = await Tasks.findById(request.params.id);
+    const project = await Projects.findById(task.project);
+
+    project.tasks = await project.tasks.filter((taskElement) => 
+        String(taskElement) !== String(task._id)
+    )
+
+    await project.save();
+    const removedTask = await task.remove();
+
+    response.json(removedTask);
 })
 
 module.exports = taskRouter;

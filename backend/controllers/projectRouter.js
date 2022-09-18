@@ -12,6 +12,13 @@ projectRouter.get("/", (request, response) => {
     });
 });
 
+//GET ONE
+projectRouter.get("/:id", (request, response) => {
+  Projects.findById(request.params.id).then((project) => {
+      response.json(project);
+  });
+});
+
 //POST
 //find user who create the project with user id and then create a project with name, description from request body, createdDate as current time and creators set to user id
 //save the project into MongoDB then with the returned object's id saved it to user projects.
