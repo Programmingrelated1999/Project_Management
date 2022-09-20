@@ -40,6 +40,19 @@ taskRouter.post("/", async (request, response) => {
     response.json(savedTask);
 })
 
+//PUT
+//update the task using findOneAndUpdate method with the data is from request.body. Cannot set variable after awaiting update since findOneAndUpdate return object before update.
+//get the task from the database since cannot immediately get data with findOneAndUpdate.
+taskRouter.put("/:id", async(request, response) => {
+    const taskToUpdate = await Tasks.findById(request.params.id);
+
+    taskToUpdate.assigned = request.body.assigned? request.body.assigned : taskToUpdate.assigned;
+
+    const returnTask = await taskToUpdate.save();
+
+    response.json(returnTask);
+});
+
 //DELETE
 //first get the task from link id, then get the project from the task.project. 
 //filter the tasks from project to remove the current task from the list, then saved the project. 
@@ -51,7 +64,7 @@ taskRouter.delete("/:id", async (request, response) => {
     project.tasks = await project.tasks.filter((taskElement) => 
         String(taskElement) !== String(task._id)
     )
-
+    
     await project.save();
     const removedTask = await task.remove();
 

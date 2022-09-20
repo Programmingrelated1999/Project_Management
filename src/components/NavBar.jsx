@@ -1,10 +1,18 @@
-import React from 'react'
+//import React
+import React from 'react';
+
+//import Bootstrap
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+
+//import CSS
 import "./NavBar.css"
-import Home from "./Home"
 
 //import Components
 import Projects from './Projects';
 import Tasks from './Tasks';
+import Home from "./Home";
 
 //material UI icons import
 import AssignmentIcon from '@mui/icons-material/Assignment';

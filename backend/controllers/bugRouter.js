@@ -40,6 +40,15 @@ bugRouter.post("/", async (request, response) => {
     response.json(savedBug);
 });
 
+//PUT
+//update the Bug using findOneAndUpdate method with the data is from request.body. Cannot set variable after awaiting update since findOneAndUpdate return object before update.
+//get the bug from the database since cannot immediately get data with findOneAndUpdate.
+bugRouter.put("/:id", async(request, response) => {
+    await Bugs.findOneAndUpdate({_id: request.params.id}, request.body);
+    const bugtAfterUpdate = await Bugs.findById(request.params.id);
+    response.json(bugAfterUpdate);
+})
+
 
 //DELETE
 //first get the bug from link id, then get the project from the bug.project. 

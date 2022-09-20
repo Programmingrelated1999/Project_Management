@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 
 //Schema Definition
-//name - String, description - String, questions - {Question - Schema}
+//name, bio - String, will have a list of projects, tasks, and bugs
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
