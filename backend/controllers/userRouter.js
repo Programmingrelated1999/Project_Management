@@ -24,6 +24,15 @@ userRouter.post("/", async (request, response) => {
     response.json(savedUser);
 });
 
+//PUT
+//update a user by id
+userRouter.put("/:id", async (request, response) => {
+  const user = await Users.findById(request.params.id);
+  user.name = request.body.name? request.body.name: user.name;
+  const savedUser = await user.save();
+  response.json(savedUser);
+});
+
 //DELETE
 userRouter.delete("/:id", async (request, response) => {
   const user = await Users.findById(request.params.id);

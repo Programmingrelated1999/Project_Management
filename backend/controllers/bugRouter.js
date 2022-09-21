@@ -24,7 +24,7 @@ bugRouter.get("/:id", (request, response) => {
 //save the bug into MongoDB then with the returned object's id saved it to project's bugs.
 //update the project and return newly created bug.
 bugRouter.post("/", async (request, response) => {
-    const project = await Projects.findById(request.body.projectId);
+    const project = await Projects.findById(request.body.project);
 
     const bug = new Bugs({
         name: request.body.name,

@@ -24,7 +24,7 @@ taskRouter.get("/:id", (request, response) => {
 //save the task into MongoDB then with the returned object's id saved it to project's tasks.
 //update the project and return newly created task.
 taskRouter.post("/", async (request, response) => {
-    const project = await Projects.findById(request.body.projectId);
+    const project = await Projects.findById(request.body.project);
 
     const task = new Tasks({
         name: request.body.name,
