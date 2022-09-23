@@ -16,6 +16,7 @@ const testHelper = require("./test_helper");
 const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialTasks = testHelper.initialTasks;
+const additionalUsers = testHelper.additionalUsers;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -118,9 +119,133 @@ describe('task POST Method', () => {
       const names = response.body.map((object) => object.name);
       expect(names).toContain('Task 5');
     });
+
+    //test POST task method to check if createdDate is added when a task is created
+    test('a task created contains createdDate variable in Date', async () => {
+        //get first project for the task
+        const project = await Projects.findOne({name: initialProjects[0].name});
+        //new task to be added
+        const newTask =  {
+            name: "Task 5",
+            description: "Task Description 5",
+            project: project._id,
+        };
+        //post the task
+        await api.post('/api/tasks').send(newTask)
+        //test if the newly added task contains createdDate variable which is in Date format
+        const task = await Tasks.findOne({name: "Task 5"});
+        expect(task.createdDate).toBeInstanceOf(Date);
+    });
+  
+    //test POST task method to check if createdDate is added when a task is created
+    test('a task created contains createdDate variable in Date', async () => {
+        //get first project for the task
+        const project = await Projects.findOne({name: initialProjects[0].name});
+        //new task to be added
+        const newTask =  {
+            name: "Task 5",
+            description: "Task Description 5",
+            project: project._id,
+        };
+        //post the task
+        await api.post('/api/tasks').send(newTask)
+        //test if the newly added task contains createdDate variable which is in Date format
+        const task = await Tasks.findOne({name: "Task 5"});
+        expect(task.createdDate).toBeInstanceOf(Date);
+    });
+});
+
+//Task PUT Method
+describe('task PUT Method', () => {
+    //test PUT task method to make sure that a task is successfully updated with data without linking.
+    test('a task is successfully updated with data without linking', async () => {
+      //get first task and id for PUT link
+      const task = await Tasks.findOne({name: initialTasks[0].name});
+      const id = task.id;
+    
+      const updateTask = {
+        name: "Task 6",
+        description: "Task Description 6",
+      }
+
+      await api.put(`/api/tasks/${task.id}`).send(updateTask);
+
+      const updatedTask = await Tasks.findById(id);
+      expect(updatedTask.name).toEqual(updateTask.name);
+      expect(updatedTask.description).toEqual(updateTask.description);
+    });
+
+    //test PUT task method to make sure that a task is successfully updated with data without linking.
+    test('a task is successfully updated with the user linking', async () => {
+        //get first task and id for PUT link, store the initial Length of assigned list for validation of the updated assigned list.
+        const task = await Tasks.findOne({name: initialTasks[0].name});
+        const id = task._id;
+
+        //create new Users from additional users for adding users.
+        let newUsersIdArray = [];
+        for (let user of additionalUsers) {
+            let userObject = new Users(user)
+            const newUser = await userObject.save()
+            newUsersIdArray = newUsersIdArray.concat(newUser._id);
+        }
+
+        //update Task has corrent length after checking. 
+        const updateTask = {
+            name: "Task 6",
+            assigned: task.assigned.concat(newUsersIdArray)
+        }
+
+        const updatedTaskResponse = await api.put(`/api/tasks/${task.id}`).send(updateTask);
+        const updatedTaskAssign = updatedTaskResponse.body.assigned.map((user) => String(user));
+        expect(updatedTaskAssign).toHaveLength(task.assigned.length + 2);
+        
+        for( let user of newUsersIdArray){
+            let checkingUser = await Users.findById(user);
+            const tasksForCheck = checkingUser.tasks.map((task) => String(task));
+            expect(tasksForCheck).toContain(String(id));
+        }
+    });
+});
+
+//Task DELETE Method
+describe('task DELETE Method', () => {
+    //test to see if a task can be succesfully deleted from a list.
+    test('a task is successfully deleted', async() => {
+      //get first task and id for DELETE link
+      const taskToDelete = await Tasks.findOne({name: initialTasks[0].name});
+
+      //make DELETE request and get all the tasks.
+      await api.delete(`/api/tasks/${taskToDelete.id}`);
+      const tasks = await Tasks.find({});
+
+      //the tasks list should have length one lower than the initial tasks length since one got deleted.
+      expect(tasks).toHaveLength(initialTasks.length-1);
+    })
+
+    //test to see if the users and projects task list got updated after the task got deleted
+    test('deleting a task would remove the task from the user and project task list', async() => {
+      //get first task and id for DELETE link
+      const taskToDelete = await Tasks.findOne({name: initialTasks[0].name});
+
+      //variable taskToDeleteId stores delete task id for validation. The user list contains list of ids of users from task assigned. The project id is the project of the task.
+      const taskToDeleteId = taskToDelete.id;
+      const userList = taskToDelete.assigned.map((user) => user);
+      const projectId = taskToDelete.project;
+
+      //make a delete request.
+      await api.delete(`/api/tasks/${taskToDelete.id}`);
+
+      //check if the project contains the task. It should not contain since the task got deleted. 
+      const projectToCheck = await Projects.findById(projectId);
+      expect(projectToCheck.tasks).not.toContain(taskToDeleteId);
+
+      //check if the users contain the task. It should not contain since the task got deleted. 
+      for(let user of userList){
+        const userToCheck = await Users.findById(user);
+        expect(userToCheck.tasks).not.toContain(taskToDeleteId);
+      }
+    })
 })
-
-
 
 afterAll(() => {
     mongoose.connection.close()

@@ -4,6 +4,7 @@ const taskRouter = require("express").Router();
 //require Modals
 const Tasks = require("../models/tasks");
 const Projects = require("../models/projects");
+const Users = require("../models/users");
 
 //GET ALL
 taskRouter.get("/", (request, response) => {
@@ -41,32 +42,76 @@ taskRouter.post("/", async (request, response) => {
 })
 
 //PUT
-//update the task using findOneAndUpdate method with the data is from request.body. Cannot set variable after awaiting update since findOneAndUpdate return object before update.
-//get the task from the database since cannot immediately get data with findOneAndUpdate.
 taskRouter.put("/:id", async(request, response) => {
+    //find the task to Update with id from request.params.id
     const taskToUpdate = await Tasks.findById(request.params.id);
 
-    taskToUpdate.assigned = request.body.assigned? request.body.assigned : taskToUpdate.assigned;
+    //check the basics data of task to update, if there is any basic data from incoming request update.
+    taskToUpdate.name = request.body.name? request.body.name : taskToUpdate.name;
+    taskToUpdate.description = request.body.description? request.body.description : taskToUpdate.description;
+    taskToUpdate.endDate = request.body.endDate? request.body.endDate : taskToUpdate.endDate;
 
-    const returnTask = await taskToUpdate.save();
+    //if there are any assigned - linking data, update the assigned list in the task along with updating the tasks of the users to include the current task.
+    if(request.body.assigned){
+        //first unique checks if there are any task in existing array that is not in new array. Second vise versa. 
+        let unique = []
+        const oldArray = taskToUpdate.assigned.map((user) => String(user));
+        const newArray = request.body.assigned.map((user) => String(user));
+        console.log("Old array", oldArray);
+        console.log("New array", newArray);
+        for(let user of oldArray){
+            if(!newArray.includes(user)){
+                unique = unique.concat(user);
+            }
+        }
+        for(let user of newArray){
+            if(!oldArray.includes(user)){
+                unique = unique.concat(user);
+            }
+        }
+        for(let userId of unique){
+            const userToUpdate = await Users.findById(userId);
+            //console.log("The user can be retrieved from the unique array");
 
-    response.json(returnTask);
-});
+            if(userToUpdate.tasks.includes(taskToUpdate.id)) {                
+                    console.log("needs to remove", userToUpdate.name);
+                    userToUpdate.tasks = userToUpdate.tasks.filter((task) => String(task) !== String(taskToUpdate._id));
+                    taskToUpdate.assigned = taskToUpdate.assigned.filter((user) => String(user) !== String(userToUpdate._id));
+                    await userToUpdate.save();
+            } else {
+                    console.log("needs to add", userToUpdate.name);
+                    userToUpdate.tasks = userToUpdate.tasks.concat(taskToUpdate.id);
+                    taskToUpdate.assigned = taskToUpdate.assigned.concat(userToUpdate.id);
+                    await userToUpdate.save();
+            }
+        };
+    }
+    const savedTask = await taskToUpdate.save();
+    response.json(savedTask);
+})
 
 //DELETE
 //first get the task from link id, then get the project from the task.project. 
 //filter the tasks from project to remove the current task from the list, then saved the project. 
 //remove the task and then return the removedTask information.
 taskRouter.delete("/:id", async (request, response) => {
-    const task = await Tasks.findById(request.params.id);
-    const project = await Projects.findById(task.project);
+    const taskToDelete = await Tasks.findById(request.params.id);
+    const project = await Projects.findById(taskToDelete.project);
 
     project.tasks = await project.tasks.filter((taskElement) => 
-        String(taskElement) !== String(task._id)
+        String(taskElement) !== String(taskToDelete._id)
     )
-    
+
     await project.save();
-    const removedTask = await task.remove();
+
+    const userList = taskToDelete.assigned.map((user) => user.id);
+    for (let user of userList){
+        const userToUpdate = await Users.findById(user);
+        userToUpdate.tasks = userToUpdate.tasks.filter((task) => task != taskToDelete.id);
+        await userToUpdate.save();
+    }
+
+    const removedTask = await taskToDelete.remove();
 
     response.json(removedTask);
 })

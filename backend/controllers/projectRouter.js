@@ -26,7 +26,7 @@ projectRouter.get("/:id", (request, response) => {
 //save the project into MongoDB then with the returned object's id saved it to user projects.
 //update the user and return newly created project.
 projectRouter.post("/", async (request, response) => {
-  const user = await Users.findById(request.body.userId);
+  const user = await Users.findById(request.body.user);
 
   const project = new Projects({
     name: request.body.name,

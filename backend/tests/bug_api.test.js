@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../app')
+const app = require('../app');
 
 const api = supertest(app)
 
@@ -16,6 +16,7 @@ const testHelper = require("./test_helper");
 const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialBugs = testHelper.initialBugs;
+const additionalUsers = testHelper.additionalUsers;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -79,13 +80,13 @@ describe('bug GET methods', () => {
     //test if the response is in json type
     test('bugs are returned as json', async () => {
         await api.get('/api/bugs').expect(200).expect('Content-Type', /application\/json/)
-    })
+    }, 10000)
 
     //test if all bugs are returned
     test('all bugs are returned', async () => {
         const response = await api.get('/api/bugs')
         expect(response.body).toHaveLength(initialBugs.length);
-    })
+    }, 10000)
 
     //test GET user method by id
     test('a bug is returned by id', async () => {
@@ -121,8 +122,135 @@ describe('bug POST Method', () => {
       const names = response.body.map((object) => object.name);
       expect(names).toContain('Bug 5');
     });
+
+    //test POST bug method to check if createdDate is added when a bug is created
+    test('a bug created contains createdDate variable in Date', async () => {
+      //get first project for the bug
+      const project = await Projects.findOne({name: initialProjects[0].name});
+      //new bug to be added
+      const newBug =  {
+          name: "Bug 5",
+          description: "Bug Description 5",
+          project: project._id,
+      };
+      //post the bug
+      await api.post('/api/bugs').send(newBug)
+      //test if the newly added bug contains createdDate variable which is in Date format
+      const bug = await Bugs.findOne({name: "Bug 5"});
+      expect(bug.createdDate).toBeInstanceOf(Date);
+    });
+
+    //test POST bug method to check if createdDate is added when a bug is created
+    test('a bug created contains createdDate variable in Date', async () => {
+      //get first project for the bug
+      const project = await Projects.findOne({name: initialProjects[0].name});
+      //new bug to be added
+      const newBug =  {
+          name: "Bug 5",
+          description: "Bug Description 5",
+          project: project._id,
+      };
+      //post the bug
+      await api.post('/api/bugs').send(newBug)
+      //test if the newly added bug contains createdDate variable which is in Date format
+      const bug = await Bugs.findOne({name: "Bug 5"});
+      expect(bug.createdDate).toBeInstanceOf(Date);
+    });
 })
 
+//Bug PUT Method
+describe('bug PUT Method', () => {
+    //test PUT bug method to make sure that a bug is successfully updated with data without linking.
+    test('a bug is successfully updated with data without linking', async () => {
+      //get first bug and id for PUT link
+      const bug = await Bugs.findOne({name: initialBugs[0].name});
+      const id = bug.id;
+    
+      const updateBug = {
+        name: "Bug 6",
+        description: "Bug Description 6",
+      }
+
+      await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+
+      const updatedBug = await Bugs.findById(id);
+      expect(updatedBug.name).toEqual(updateBug.name);
+      expect(updatedBug.description).toEqual(updateBug.description);
+    });
+
+    //test PUT bug method to make sure that a bug is successfully updated with data without linking.
+    test('a bug is successfully updated with the user linking', async () => {
+        //get first bug and id for PUT link, store the initial Length of assigned list for validation of the updated assigned list.
+        const bug = await Bugs.findOne({name: initialBugs[0].name});
+        const id = bug._id;
+
+        //create new Users from additional users for adding users.
+        let newUsersIdArray = [];
+        for (let user of additionalUsers) {
+            let userObject = new Users(user)
+            const newUser = await userObject.save()
+            newUsersIdArray = newUsersIdArray.concat(newUser._id);
+        }
+
+        //update Bug has corrent length after checking. 
+        const updateBug = {
+            name: "Bug 6",
+            assigned: bug.assigned.concat(newUsersIdArray)
+        }
+
+        const updatedBugResponse = await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+        const updatedBugAssign = updatedBugResponse.body.assigned.map((user) => String(user));
+        expect(updatedBugAssign).toHaveLength(bug.assigned.length + 2);
+        
+        for( let user of newUsersIdArray){
+            let checkingUser = await Users.findById(user);
+            const bugsForCheck = checkingUser.bugs.map((bug) => String(bug));
+            expect(bugsForCheck).toContain(String(id));
+        }
+    });
+});
+
+//Bug DELETE Method
+describe('bug DELETE Method', () => {
+    //test to see if a bug can be succesfully deleted from a list.
+    test('a bug is successfully deleted', async() => {
+      //get first bug and id for DELETE link
+      const bugToDelete = await Bugs.findOne({name: initialBugs[0].name});
+
+      //make DELETE request and get all the bugs.
+      await api.delete(`/api/bugs/${bugToDelete.id}`);
+      const bugs = await Bugs.find({});
+
+      //the bugs list should have length one lower than the initial bugs length since one got deleted.
+      expect(bugs).toHaveLength(initialBugs.length-1);
+    })
+
+    //test to see if the users and projects bug list got updated after the bug got deleted
+    test('deleting a bug would remove the bug from the user and project bug list', async() => {
+      //get first bug and id for DELETE link
+      const bugToDelete = await Bugs.findOne({name: initialBugs[0].name});
+
+      //variable bugToDeleteId stores delete bug id for validation. The user list contains list of ids of users from bug assigned. The project id is the project of the bug.
+      const bugToDeleteId = bugToDelete.id;
+      const userList = bugToDelete.assigned.map((user) => user);
+      const projectId = bugToDelete.project;
+
+      //make a delete request.
+      await api.delete(`/api/bugs/${bugToDelete.id}`);
+
+      //check if the project contains the bug. It should not contain since the bug got deleted. 
+      const projectToCheck = await Projects.findById(projectId);
+      expect(projectToCheck.bugs).not.toContain(bugToDeleteId);
+
+      //check if the users contain the bug. It should not contain since the bug got deleted. 
+      for(let user of userList){
+        const userToCheck = await Users.findById(user);
+        expect(userToCheck.bugs).not.toContain(bugToDeleteId);
+      }
+    })
+})
+
+//close connection after all
 afterAll(() => {
     mongoose.connection.close()
 }) 
