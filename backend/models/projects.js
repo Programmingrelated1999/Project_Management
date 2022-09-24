@@ -42,7 +42,11 @@ const projectSchema = new mongoose.Schema({
   }, 
   endDate: {
       type: Date,
-  }
+  },
+  invites: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+  }]
 });
 
 //setSchema

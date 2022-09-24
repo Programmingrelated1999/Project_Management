@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Bug",
   }],
+  projectInvites:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+  }],
 });
 
 //setSchema

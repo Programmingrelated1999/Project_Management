@@ -12,6 +12,7 @@ const Bugs = require("../models/bugs");
 
 //import testHelper
 const testHelper = require("./test_helper");
+const { useResolvedPath } = require('react-router');
 
 //initial data
 const initialUsers = testHelper.initialUsers;
@@ -96,10 +97,143 @@ describe('task GET methods', () => {
         const idToCheck = projectArrayResponse[0].id;
         const projectNameCheck = projectArrayResponse[0].name;
         //use the first project's id to find a project by Id, if the response is the same project(check by name), test pass
-        const projectSingleResponse = await Projects.findById(idToCheck);
-        expect(projectSingleResponse.name).toEqual(projectNameCheck);
+        const projectSingleResponse = await api.get(`/api/projects/${idToCheck}`);
+        expect(projectSingleResponse.body.name).toEqual(projectNameCheck);
     });
-})
+});
+
+//Project POST METHOD
+describe('project POST Method', () => {
+    
+    //test POST task method to make sure that a project is successfully created without invite list.
+    test('a project is successfully added', async () => {
+      //get first creator for the task
+      const creator = await Users.findOne({name: initialUsers[0].name});
+
+      //new project to be added
+      const newProject =  {
+          name: "Project 3",
+          description: "Project Description 3",
+          creator: creator._id,
+          createdDate: Date.now()
+      };
+
+      //post the project
+      const createdProjectResponse = await api.post('/api/projects').send(newProject);
+
+      //test if the projects count is increased by 1.
+      const allProjects = await Projects.find({});
+      expect(allProjects).toHaveLength(initialProjects.length + 1);
+      //first get the createdProject in a correct forma, then check if the createdDate is in Date format
+      const createdProject = await Projects.findById(createdProjectResponse.body.id);
+      expect(createdProject.createdDate).toBeInstanceOf(Date);
+      //check if the creator is createdProject.creator
+      expect(createdProject.creator).toEqual(creator._id);
+    });
+
+    //test POST task method to make sure that a project is successfully created without invite list and the creator projects include the project
+    test('a project added, the creator must be updated to include project', async () => {
+      //get first creator for the task
+      const creator = await Users.findOne({name: initialUsers[0].name});
+
+      //new project to be added
+      const newProject =  {
+          name: "Project 3",
+          description: "Project Description 3",
+          creator: creator._id,
+          createdDate: Date.now()
+      };
+
+      //post the project
+      const createdProjectResponse = await api.post('/api/projects').send(newProject);
+      //get the user again after creation
+      const creatorCheck = await Users.findOne({name: initialUsers[0].name});
+      //since the creatorCheck.projects contains objects by id will need to transform them into strings for comparison
+      const creatorCheckProjects = await creatorCheck.projects.map((project) => String(project));
+      expect(creatorCheckProjects).toContain((String(createdProjectResponse.body.id)));
+    });
+
+    //test POST task method to make sure that a project is successfully created with invite list and invites have the project saved in their projectInvites.
+    test('a project added with invites, invites must be included and invites should have created project id', async () => {
+      //get first creator for the task, get next 2 users and add them to the invite list
+      const creator = await Users.findOne({name: initialUsers[0].name});
+      const invite1 = await Users.findOne({name: initialUsers[1].name});
+      const invite2 = await Users.findOne({name: initialUsers[2].name});
+      const inviteList = [invite1._id, invite2._id];
+
+      //new project to be added
+      const newProject =  {
+          name: "Project 3",
+          description: "Project Description 3",
+          creator: creator._id,
+          createdDate: Date.now(),
+          invites: inviteList
+      };
+
+      //post the project, get the response with the response.id(which is a string) get the object created.
+      const createdProjectResponse = await api.post('/api/projects').send(newProject);
+      const postedProjectForCheck = await Projects.findById(createdProjectResponse.body.id)
+
+      //check the objects, cannot let object comparison with toContain, use toContainEqual
+      for(let invite of inviteList){
+        expect(postedProjectForCheck.invites).toContainEqual(invite);
+        const invitedUser = await Users.findById(invite);
+        expect(invitedUser.projectInvites).toContainEqual(postedProjectForCheck._id);
+      }
+    });
+});
+
+//Project DELETE METHOD
+describe('project DELETE Method', () => {
+    //test DELETE task method to make sure that a project is successfully deleted.
+    test('a project is successfully deleted', async () => {
+        const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
+        
+        await api.delete(`/api/projects/${projectToDelete.id}`);
+
+        const allProjects = await Projects.find({});
+        expect(allProjects).toHaveLength(initialProjects.length-1);
+    });
+
+    //test DELETE task method to make sure that a project is successfully deleted.
+    test('when a project is deleted, its users are deleted', async () => {
+        //delete the first project
+        const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
+        
+        //add all users to userList 
+        let userList = [];
+        userList = userList.concat(projectToDelete.creator);
+        userList = userList.concat(projectToDelete.admins);
+        userList = userList.concat(projectToDelete.developers);
+        userList = userList.concat(projectToDelete.clients);
+        userList = userList.concat(projectToDelete.invites);
+        
+        //delete request
+        await api.delete(`/api/projects/${projectToDelete.id}`);
+
+        //for user of userList find the user and get the user's projects and projectsInvites, they should not have the deleted project id
+        for(let user of userList){
+            const userObject = await Users.findById(user);
+            const projectsToCheck = userObject.projects.map((project) => String(project));
+            const projectsInvitesToCheck = userObject.projects.map((projectInvites) => String(projectInvites));
+            expect(projectsToCheck).not.toContain(projectToDelete.id);
+            expect(projectsInvitesToCheck).not.toContain(projectToDelete.id);
+        }
+    });
+
+    //test DELETE task method to make sure that a project's tasks are successfully deleted (Haven't check if the tasks disappear from users)
+    test('when a project is deleted, its tasks are deleted along with users associated with it', async () => {
+        //delete the first project
+        const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
+        
+        //delete request
+        await api.delete(`/api/projects/${projectToDelete.id}`);
+
+        //get all tasks, it will be reduced by 2 since 2 were deleted.
+        const allTasks = await Tasks.find({});
+        expect(allTasks).toHaveLength(initialTasks.length-2);
+    });
+});
 
 afterAll(() => {
     mongoose.connection.close()
