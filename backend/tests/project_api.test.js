@@ -12,7 +12,6 @@ const Bugs = require("../models/bugs");
 
 //import testHelper
 const testHelper = require("./test_helper");
-const { useResolvedPath } = require('react-router');
 
 //initial data
 const initialUsers = testHelper.initialUsers;
@@ -25,6 +24,7 @@ beforeEach(async () => {
     await Users.deleteMany({});
     await Projects.deleteMany({});
     await Tasks.deleteMany({});
+    await Bugs.deleteMany({});
     for (let user of initialUsers) {
         let userObject = new Users(user)
         await userObject.save()
@@ -75,20 +75,39 @@ beforeEach(async () => {
     await usersAfterCreation[1].save();
     usersAfterCreation[2].tasks = usersAfterCreation[2].tasks.concat(taskIds);
     await usersAfterCreation[2].save();
-});
+
+    //create all bugs and they are under project 1 its admin and developer assigned to every bug.
+    for(let bug of initialBugs){
+        bug.project = projectIds[0];
+        bug.assigned = [].concat([projectsAfterCreation[0].admins[0], projectsAfterCreation[0].developers[0]]);
+        bug.createdDate = Date.now();
+        let bugObject = new Bugs(bug);
+        await bugObject.save();
+    }
+    //get bugsAfterCreation to update the projects and users with bugs id later
+    const bugsAfterCreation = await Bugs.find({});
+
+    const bugIds = bugsAfterCreation.map((bug) => (bug.id));
+    projectsAfterCreation[0].bugs = projectsAfterCreation[0].bugs.concat(bugIds);
+    await projectsAfterCreation[0].save();
+    usersAfterCreation[1].bugs = usersAfterCreation[1].bugs.concat(bugIds);
+    usersAfterCreation[2].bugs = usersAfterCreation[2].bugs.concat(bugIds);
+    await usersAfterCreation[1].save();
+    await usersAfterCreation[2].save();
+}, 10000);
 
 //Task GET method
-describe('task GET methods', () => {
+describe('project GET methods', () => {
     //test if the response is in json type
-    test('tasks are returned as json', async () => {
+    test('projects are returned as json', async () => {
         await api.get('/api/projects').expect(200).expect('Content-Type', /application\/json/)
-    })
+    });
 
     //test if the Get method returns all
     test('all projects are returned', async () => {
         const response = await api.get('/api/projects')
         expect(response.body).toHaveLength(initialProjects.length);
-    })
+    });
         
     //test GET user method by id
     test('a project is returned by id', async () => {
@@ -99,7 +118,7 @@ describe('task GET methods', () => {
         //use the first project's id to find a project by Id, if the response is the same project(check by name), test pass
         const projectSingleResponse = await api.get(`/api/projects/${idToCheck}`);
         expect(projectSingleResponse.body.name).toEqual(projectNameCheck);
-    });
+    },10000);
 });
 
 //Project POST METHOD
@@ -183,6 +202,96 @@ describe('project POST Method', () => {
     });
 });
 
+//Project PUT Method
+describe('project PUT Method', () => {
+
+    //project PUT method to make sure that a project is updated with basics name and description.
+    test('a project is successfully updated with basic information', async () => {
+      //get first project and id for PUT link
+      const project = await Projects.findOne({name: initialProjects[0].name});
+      //both _id and id works here. (TESTED)
+      const id = project.id;
+    
+      //update Project for sending data
+      const updateProject = {
+        name: "Project 6",
+        description: "Project Description 6",
+      }
+
+      await api.put(`/api/projects/${project.id}`).send(updateProject);
+
+      const updatedProject = await Projects.findById(id);
+      expect(updatedProject.name).toEqual(updateProject.name);
+      expect(updatedProject.description).toEqual(updateProject.description);
+    });
+
+    //project PUT method to make sure that a project can be updated to invite users. 
+    //first create a user, put it in invite list. Then remove the user from the invite list. 
+    test('a project is successfully updated to add invites', async () => {
+        //get the first project to update
+        const project = await Projects.findOne({name: initialProjects[0].name});
+        const projectId = project.id;
+
+        //create the first additional user. put the user to the invite list. saved User is the response. 
+        const userToCreate = new Users(testHelper.additionalUsers[0]);
+        const savedUser = await userToCreate.save();
+
+        const updateData = {
+            addInvites: [savedUser._id]
+        }
+
+        //response is to get the project. Check if the invites conatin savedUser.
+        //userAfterUpdate to check if the user contains project in projectInvitees.
+        const response = await api.put(`/api/projects/${projectId}`).send(updateData);
+        const userAfterUpdate = await Users.findOne({name: testHelper.additionalUsers[0].name});
+        expect(response.body.invites).toContain(savedUser.id);
+        expect(userAfterUpdate.projectInvites).toContainEqual(project._id);
+    });
+
+    //project PUT method to make sure that a project can remove users
+    test('a project is successfully updated to remove users', async () => {
+      //get first project, its user admin, developer, and client. 
+      const project = await Projects.findOne({name: initialProjects[0].name});
+      const userToDeleteAdmin = await Users.findOne({name: initialUsers[1].name});
+      const userToDeleteDeveloper = await Users.findOne({name: initialUsers[2].name});
+      const userToDeleteClient = await Users.findOne({name: initialUsers[3].name});
+
+      //removeUsers set to a list of users of admin, developer, and client.
+      const updateData = {
+        removeUsers: [userToDeleteAdmin._id, userToDeleteDeveloper._id, userToDeleteClient._id]
+      }
+      //api method
+      const response = await api.put(`/api/projects/${project._id}`).send(updateData);
+
+      //check if the admins, developes, and clients count got reduced by 1.
+      expect(response.body.admins).toHaveLength(project.admins.length - 1);
+      expect(response.body.developers).toHaveLength(project.developers.length - 1);
+      expect(response.body.clients).toHaveLength(project.clients.length - 1);
+    });
+
+    //project PUT method to make sure that a project's user role is updated
+    //error if the user does not exists or the userrole does not exist
+    test('a project is successfully updated with user Roles', async () => {
+      //get first project and 4th user id for PUT link. 4th user is the client
+      const project = await Projects.findOne({name: initialProjects[0].name});
+      const user = await Users.findOne({name: initialUsers[3].name});
+    
+      //update Project for sending data
+      const updateData = {
+        role: "developer"
+      }
+
+      //make a PUT request, current user role is client, should be developer after update.
+      await api.put(`/api/projects/${project.id}/${user.id}`).send(updateData);
+
+      //find updatedproject, check if developers increased by 1 and clients decrease by 1.
+      const updatedProject = await Projects.findById(project.id);
+      expect(updatedProject.developers).toHaveLength(project.developers.length + 1);
+      expect(updatedProject.clients).toHaveLength(project.clients.length - 1);
+    });
+
+});
+
 //Project DELETE METHOD
 describe('project DELETE Method', () => {
     //test DELETE task method to make sure that a project is successfully deleted.
@@ -193,7 +302,7 @@ describe('project DELETE Method', () => {
 
         const allProjects = await Projects.find({});
         expect(allProjects).toHaveLength(initialProjects.length-1);
-    });
+    }, 10000);
 
     //test DELETE task method to make sure that a project is successfully deleted.
     test('when a project is deleted, its users are deleted', async () => {
@@ -233,8 +342,21 @@ describe('project DELETE Method', () => {
         const allTasks = await Tasks.find({});
         expect(allTasks).toHaveLength(initialTasks.length-2);
     });
+
+    //test DELETE bug method to make sure that a project's bugs are successfully deleted (Haven't check if the bugs disappear from users)
+    test('when a project is deleted, its bugs are deleted along with users associated with it', async () => {
+        //delete the first project
+        const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
+        
+        //delete request
+        await api.delete(`/api/projects/${projectToDelete.id}`);
+
+        //get all bugs, it will be reduced to 0 since all bugs are in first project.
+        const allBugs = await Bugs.find({});
+        expect(allBugs).toHaveLength(0);
+    }, 10000);
 });
 
 afterAll(() => {
     mongoose.connection.close()
-}) 
+})

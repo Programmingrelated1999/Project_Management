@@ -111,9 +111,64 @@ projectRouter.put("/:id", async(request, response) => {
   projectToUpdate.name = request.body.name? request.body.name: projectToUpdate.name;
   projectToUpdate.description = request.body.description? request.body.description: projectToUpdate.description;
 
+  //if there are any addInvites then add them to the invite list.
+  if(request.body.addInvites){
+    for(let user of request.body.addInvites){
+      const userToUpdate = await Users.findById(user);
+      userToUpdate.projectInvites = userToUpdate.projectInvites.concat(projectToUpdate._id);
+      projectToUpdate.invites = projectToUpdate.invites.concat(userToUpdate._id);
+      await userToUpdate.save();
+    }
+  }
+
+  //if there are any remove members, for each memeber remove project from projectInvites and projects.
+  //remove member id from project developers, admins, clients, invites
+  if(request.body.removeUsers){
+    for(let user of request.body.removeUsers){
+      const userToRemove = await Users.findById(user);
+      userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
+      userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
+      projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
+      projectToUpdate.admins = projectToUpdate.admins.filter((userElement) => String(userElement) !== String(userToRemove._id));
+      projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
+      projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
+      await userToRemove.save();
+    }
+  }
+
   const savedProject = await projectToUpdate.save();
   response.json(savedProject);
 })
+
+projectRouter.put("/:id/:userId", async(request, response) => {
+  //get the project to be updated and store it in projectToUpdate variable.
+  const projectToUpdate = await Projects.findById(request.params.id);
+  const userToUpdate = await Users.findById(request.params.userId);
+  const validRoles = ["admin", "developer", "client"];
+
+  if(validRoles.includes(request.body.role)){
+    projectToUpdate.clients = projectToUpdate.clients.filter((clientElement) => String(clientElement) !== String(userToUpdate._id));
+    projectToUpdate.admins = projectToUpdate.admins.filter((adminElement) => String(adminElement) !== String(userToUpdate._id));
+    projectToUpdate.developers = projectToUpdate.developers.filter((developerElement) => String(developerElement) !== String(userToUpdate._id));
+  }
+
+  switch(request.body.role){
+    case 'developer':
+      projectToUpdate.developers = projectToUpdate.developers.concat(userToUpdate._id);
+      break;
+    case 'admin':
+      projectToUpdate.admins = projectToUpdate.admins.concat(userToUpdate._id);
+      break;
+    case 'client':
+      projectToUpdate.clients = projectToUpdate.clients.concat(userToUpdate._id);
+      break;
+    default:
+      break;
+  }
+
+  const savedProject = await projectToUpdate.save();
+  response.json(savedProject);
+});
 
 //DELETE
 //get project by the id in the link. Then delete each tasks and bugs from the project.
@@ -132,11 +187,16 @@ projectRouter.delete("/:id", async (request, response) => {
     await taskToDelete.remove();
   };
 
-  //delete bugs
-  await project.bugs.forEach(async (bug) => {
+  //delete bug
+  for(let bug of project.bugs){
     const bugToDelete = await Bugs.findById(bug);
+    for(let user of bugToDelete.assigned){
+      const userToUpdate = await Users.findById(user);
+      userToUpdate.bugs = userToUpdate.bugs.filter((bugElement) => String(bugElement) !== String(bugToDelete._id));
+      await userToUpdate.save();
+    }
     await bugToDelete.remove();
-  })
+  };
 
   //delete creator
   const creator = await Users.findById(project.creator);
