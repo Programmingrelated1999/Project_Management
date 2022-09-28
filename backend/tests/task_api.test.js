@@ -9,6 +9,9 @@ const api = supertest(app)
 //import bcrypt
 const bcrypt = require('bcrypt');
 
+//import jwt
+const jwt = require('jsonwebtoken');
+
 //import Models
 const Tasks = require("../models/tasks");
 const Projects = require("../models/projects");
@@ -22,6 +25,8 @@ const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialTasks = testHelper.initialTasks;
 const additionalUsers = testHelper.additionalUsers;
+
+let token;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -79,6 +84,13 @@ beforeEach(async () => {
     await usersAfterCreation[1].save();
     usersAfterCreation[2].tasks = usersAfterCreation[2].tasks.concat(taskIds);
     await usersAfterCreation[2].save();
+
+    const adminUser = await Users.findOne({name: initialUsers[1].name});
+    const userForToken = {
+        username: adminUser.name,
+        id: adminUser._id,
+    }
+    token = 'bearer ' + jwt.sign(userForToken, process.env.SECRET);
 });
 
 //Task GET method
@@ -120,7 +132,7 @@ describe('task POST Method', () => {
           project: project._id,
       };
       //post the task
-      await api.post('/api/tasks').send(newTask)
+      await api.post('/api/tasks').send(newTask).set('Authorization', token);
       //test if the tasks count is increased by 1.
       const response = await api.get('/api/tasks');
       expect(response.body).toHaveLength(initialTasks.length + 1)
@@ -140,7 +152,7 @@ describe('task POST Method', () => {
             project: project._id,
         };
         //post the task
-        await api.post('/api/tasks').send(newTask)
+        await api.post('/api/tasks').send(newTask).set('Authorization', token);
         //test if the newly added task contains createdDate variable which is in Date format
         const task = await Tasks.findOne({name: "Task 5"});
         expect(task.createdDate).toBeInstanceOf(Date);
@@ -157,7 +169,7 @@ describe('task POST Method', () => {
             project: project._id,
         };
         //post the task
-        await api.post('/api/tasks').send(newTask)
+        await api.post('/api/tasks').send(newTask).set('Authorization', token);
         //test if the newly added task contains createdDate variable which is in Date format
         const task = await Tasks.findOne({name: "Task 5"});
         expect(task.createdDate).toBeInstanceOf(Date);
@@ -177,7 +189,7 @@ describe('task PUT Method', () => {
         description: "Task Description 6",
       }
 
-      await api.put(`/api/tasks/${task.id}`).send(updateTask);
+      await api.put(`/api/tasks/${task.id}`).send(updateTask).set('Authorization', token);
 
       const updatedTask = await Tasks.findById(id);
       expect(updatedTask.name).toEqual(updateTask.name);
@@ -196,7 +208,7 @@ describe('task PUT Method', () => {
       }
 
       //API method
-      await api.put(`/api/tasks/${task.id}`).send(updateTask);
+      await api.put(`/api/tasks/${task.id}`).send(updateTask).set('Authorization', token);
 
       //check if updated Task status is true
       const updatedTask = await Tasks.findById(id);
@@ -224,7 +236,7 @@ describe('task PUT Method', () => {
             assigned: task.assigned.concat(newUsersIdArray)
         }
 
-        const updatedTaskResponse = await api.put(`/api/tasks/${task.id}`).send(updateTask);
+        const updatedTaskResponse = await api.put(`/api/tasks/${task.id}`).send(updateTask).set('Authorization', token);
         const updatedTaskAssign = updatedTaskResponse.body.assigned.map((user) => String(user));
         expect(updatedTaskAssign).toHaveLength(task.assigned.length + 2);
         
@@ -244,7 +256,7 @@ describe('task DELETE Method', () => {
       const taskToDelete = await Tasks.findOne({name: initialTasks[0].name});
 
       //make DELETE request and get all the tasks.
-      await api.delete(`/api/tasks/${taskToDelete.id}`);
+      await api.delete(`/api/tasks/${taskToDelete.id}`).set('Authorization', token);
       const tasks = await Tasks.find({});
 
       //the tasks list should have length one lower than the initial tasks length since one got deleted.
@@ -262,7 +274,7 @@ describe('task DELETE Method', () => {
       const projectId = taskToDelete.project;
 
       //make a delete request.
-      await api.delete(`/api/tasks/${taskToDelete.id}`);
+      await api.delete(`/api/tasks/${taskToDelete.id}`).set('Authorization', token);
 
       //check if the project contains the task. It should not contain since the task got deleted. 
       const projectToCheck = await Projects.findById(projectId);

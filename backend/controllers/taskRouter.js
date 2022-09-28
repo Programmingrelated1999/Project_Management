@@ -1,10 +1,22 @@
 //create taskRouter from express Router module
 const taskRouter = require("express").Router();
 
+//require jsonwebtoken
+const jwt = require('jsonwebtoken');
+
 //require Modals
 const Tasks = require("../models/tasks");
 const Projects = require("../models/projects");
 const Users = require("../models/users");
+
+//get token function
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+      return authorization.substring(7)
+    }
+    return null
+}
 
 //GET ALL
 taskRouter.get("/", (request, response) => {
@@ -25,67 +37,112 @@ taskRouter.get("/:id", (request, response) => {
 //save the task into MongoDB then with the returned object's id saved it to project's tasks.
 //update the project and return newly created task.
 taskRouter.post("/", async (request, response) => {
+    //get token from request called to check if the header contains bearer. Then take off bearer and return token.
+    const token = getTokenFrom(request);
+    //decode the token into the user object which will contain username and id.
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    //if decode not successful, token is not valid.
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    //if token is valid, get user and the current project.
+    const user = await Users.findById(decodedToken.id);
     const project = await Projects.findById(request.body.project);
 
-    const task = new Tasks({
-        name: request.body.name,
-        createdDate: Date.now(),
-        description: request.body.description,
-        project: project._id,
-    });
+    //check user role: user must be admin or owner to create task.
+    const isUserCreator = String(project.creator) === String(user._id)? true: false;
+    const isUserAdmin = project.admins.includes(user._id)? true: false;
 
-    const savedTask = await task.save();
-    project.tasks = project.tasks.concat(savedTask._id);
-    await project.save();
-
-    response.json(savedTask);
-})
+    //if user is owner or admin, allow create task.
+    if(isUserCreator || isUserAdmin){
+        //createe a task object
+        const task = new Tasks({
+            name: request.body.name,
+            createdDate: Date.now(),
+            description: request.body.description,
+            project: project._id,
+        });
+    
+        //save the task. concat the task to project tasks and save the project.
+        const savedTask = await task.save();
+        project.tasks = project.tasks.concat(savedTask._id);
+        await project.save();
+    
+        //return saved task
+        response.json(savedTask);
+    } else{
+        //else return user is not authorized to create task.
+        response.status(401).json({error: 'user is not authorized to create task'});
+    }
+});
 
 //PUT
 taskRouter.put("/:id", async(request, response) => {
     //find the task to Update with id from request.params.id
     const taskToUpdate = await Tasks.findById(request.params.id);
 
-    //check the basics data of task to update, if there is any basic data from incoming request update.
-    taskToUpdate.name = request.body.name? request.body.name : taskToUpdate.name;
-    taskToUpdate.description = request.body.description? request.body.description : taskToUpdate.description;
-    taskToUpdate.endDate = request.body.endDate? request.body.endDate : taskToUpdate.endDate;
-    taskToUpdate.status = request.body.status? request.body.status: taskToUpdate.status;
-
-    //if there are any assigned - linking data, update the assigned list in the task along with updating the tasks of the users to include the current task.
-    if(request.body.assigned){
-        //first unique checks if there are any task in existing array that is not in new array. Second vise versa. 
-        let unique = []
-        const oldArray = taskToUpdate.assigned.map((user) => String(user));
-        const newArray = request.body.assigned.map((user) => String(user));
-        console.log("Old array", oldArray);
-        console.log("New array", newArray);
-        for(let user of oldArray){
-            if(!newArray.includes(user)){
-                unique = unique.concat(user);
-            }
-        }
-        for(let user of newArray){
-            if(!oldArray.includes(user)){
-                unique = unique.concat(user);
-            }
-        }
-        for(let userId of unique){
-            const userToUpdate = await Users.findById(userId);
-
-            if(userToUpdate.tasks.includes(taskToUpdate.id)) {                
-                    console.log("needs to remove", userToUpdate.name);
-                    userToUpdate.tasks = userToUpdate.tasks.filter((task) => String(task) !== String(taskToUpdate._id));
-                    taskToUpdate.assigned = taskToUpdate.assigned.filter((user) => String(user) !== String(userToUpdate._id));
-                    await userToUpdate.save();
-            } else {
-                    console.log("needs to add", userToUpdate.name);
-                    userToUpdate.tasks = userToUpdate.tasks.concat(taskToUpdate.id);
-                    taskToUpdate.assigned = taskToUpdate.assigned.concat(userToUpdate.id);
-                    await userToUpdate.save();
-            }
-        };
+    //get token from request called to check if the header contains bearer. Then take off bearer and return token.
+    const token = getTokenFrom(request);
+    //decode the token into the user object which will contain username and id.
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    //if decode not successful, token is not valid.
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
     }
+    //if token is valid, get user and the current project.
+    const user = await Users.findById(decodedToken.id);
+    const project = await Projects.findById(taskToUpdate.project);
+
+    //check user role: user must be admin or owner to create task.
+    const isUserCreator = String(project.creator) === String(user._id)? true: false;
+    const isUserAdmin = project.admins.includes(user._id)? true: false;
+
+    if(isUserCreator || isUserAdmin){
+        //check the basics data of task to update, if there is any basic data from incoming request update.
+        taskToUpdate.name = request.body.name? request.body.name : taskToUpdate.name;
+        taskToUpdate.description = request.body.description? request.body.description : taskToUpdate.description;
+        taskToUpdate.endDate = request.body.endDate? request.body.endDate : taskToUpdate.endDate;
+
+        //if there are any assigned - linking data, update the assigned list in the task along with updating the tasks of the users to include the current task.
+        if(request.body.assigned){
+            //first unique checks if there are any task in existing array that is not in new array. Second vise versa. 
+            let unique = []
+            const oldArray = taskToUpdate.assigned.map((user) => String(user));
+            const newArray = request.body.assigned.map((user) => String(user));
+            for(let user of oldArray){
+                if(!newArray.includes(user)){
+                    unique = unique.concat(user);
+                }
+            }
+            for(let user of newArray){
+                if(!oldArray.includes(user)){
+                    unique = unique.concat(user);
+                }
+            }
+            for(let userId of unique){
+                const userToUpdate = await Users.findById(userId);
+
+                if(userToUpdate.tasks.includes(taskToUpdate.id)) {                
+                        console.log("needs to remove", userToUpdate.name);
+                        userToUpdate.tasks = userToUpdate.tasks.filter((task) => String(task) !== String(taskToUpdate._id));
+                        taskToUpdate.assigned = taskToUpdate.assigned.filter((user) => String(user) !== String(userToUpdate._id));
+                        await userToUpdate.save();
+                } else {
+                        console.log("needs to add", userToUpdate.name);
+                        userToUpdate.tasks = userToUpdate.tasks.concat(taskToUpdate.id);
+                        taskToUpdate.assigned = taskToUpdate.assigned.concat(userToUpdate.id);
+                        await userToUpdate.save();
+                }
+            };
+        }
+    } else{
+        if(request.body.name || request.body.description || request.body.endDate || request.body.assigned){
+            //else return user is not authorized to create task.
+            response.status(401).json({error: 'user is not authorized this update method'});
+        }
+    }
+
+    taskToUpdate.status = request.body.status? request.body.status: taskToUpdate.status;
     const savedTask = await taskToUpdate.save();
     response.json(savedTask);
 })
@@ -96,24 +153,42 @@ taskRouter.put("/:id", async(request, response) => {
 //remove the task and then return the removedTask information.
 taskRouter.delete("/:id", async (request, response) => {
     const taskToDelete = await Tasks.findById(request.params.id);
+    
+    //get token from request called to check if the header contains bearer. Then take off bearer and return token.
+    const token = getTokenFrom(request);
+    //decode the token into the user object which will contain username and id.
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    //if decode not successful, token is not valid.
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    //if token is valid, get user and the current project.
+    const user = await Users.findById(decodedToken.id);
     const project = await Projects.findById(taskToDelete.project);
 
-    project.tasks = await project.tasks.filter((taskElement) => 
-        String(taskElement) !== String(taskToDelete._id)
-    )
+    //check user role: user must be admin or owner to create task.
+    const isUserCreator = String(project.creator) === String(user._id)? true: false;
+    const isUserAdmin = project.admins.includes(user._id)? true: false;
 
-    await project.save();
+    if(isUserCreator || isUserAdmin){
+        project.tasks = await project.tasks.filter((taskElement) => 
+            String(taskElement) !== String(taskToDelete._id)
+        )
+        await project.save();
 
-    const userList = taskToDelete.assigned.map((user) => user.id);
-    for (let user of userList){
-        const userToUpdate = await Users.findById(user);
-        userToUpdate.tasks = userToUpdate.tasks.filter((task) => task != taskToDelete.id);
-        await userToUpdate.save();
+        const userList = taskToDelete.assigned.map((user) => user.id);
+        for (let user of userList){
+            const userToUpdate = await Users.findById(user);
+            userToUpdate.tasks = userToUpdate.tasks.filter((task) => task != taskToDelete.id);
+            await userToUpdate.save();
+        }
+        const removedTask = await taskToDelete.remove();
+
+        response.json(removedTask);
+    } else{
+        //else return user is not authorized to create task.
+        response.status(401).json({error: 'user is not authorized to delete task'});
     }
-
-    const removedTask = await taskToDelete.remove();
-
-    response.json(removedTask);
 })
 
 module.exports = taskRouter;

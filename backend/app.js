@@ -8,6 +8,7 @@ const userRouter = require("./controllers/userRouter");
 const projectRouter = require("./controllers/projectRouter");
 const bugRouter = require("./controllers/bugRouter");
 const taskRouter = require("./controllers/taskRouter");
+const loginRouter = require("./controllers/loginRouter");
 
 //cross-origin resource sharing import
 const cors = require("cors");
@@ -36,6 +37,8 @@ app.use(cors());
 app.use(express.json());
 
 //Routers
+//bugsRouter root as /api/bugs
+app.use("/login", loginRouter);
 //userRouter root as /api/users
 app.use("/api/users", userRouter);
 //projectRouter root as /api/projects
