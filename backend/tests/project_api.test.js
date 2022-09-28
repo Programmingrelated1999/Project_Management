@@ -1,8 +1,13 @@
+//import supertest, mongoose, and app for testing 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 
+//create an api with supertest.
 const api = supertest(app)
+
+//import bcrypt
+const bcrypt = require('bcrypt');
 
 //import Models
 const Tasks = require("../models/tasks");
@@ -26,6 +31,7 @@ beforeEach(async () => {
     await Tasks.deleteMany({});
     await Bugs.deleteMany({});
     for (let user of initialUsers) {
+        user.passwordHash = await bcrypt.hash('sekret', 10)
         let userObject = new Users(user)
         await userObject.save()
     }
@@ -75,7 +81,7 @@ beforeEach(async () => {
     await usersAfterCreation[1].save();
     usersAfterCreation[2].tasks = usersAfterCreation[2].tasks.concat(taskIds);
     await usersAfterCreation[2].save();
-
+  
     //create all bugs and they are under project 1 its admin and developer assigned to every bug.
     for(let bug of initialBugs){
         bug.project = projectIds[0];
@@ -86,7 +92,7 @@ beforeEach(async () => {
     }
     //get bugsAfterCreation to update the projects and users with bugs id later
     const bugsAfterCreation = await Bugs.find({});
-
+  
     const bugIds = bugsAfterCreation.map((bug) => (bug.id));
     projectsAfterCreation[0].bugs = projectsAfterCreation[0].bugs.concat(bugIds);
     await projectsAfterCreation[0].save();
@@ -118,6 +124,7 @@ describe('project GET methods', () => {
         //use the first project's id to find a project by Id, if the response is the same project(check by name), test pass
         const projectSingleResponse = await api.get(`/api/projects/${idToCheck}`);
         expect(projectSingleResponse.body.name).toEqual(projectNameCheck);
+        expect(projectSingleResponse.body.status).toEqual(false);
     },10000);
 });
 
@@ -233,7 +240,9 @@ describe('project PUT Method', () => {
         const projectId = project.id;
 
         //create the first additional user. put the user to the invite list. saved User is the response. 
-        const userToCreate = new Users(testHelper.additionalUsers[0]);
+        let newUser = testHelper.additionalUsers[0];
+        newUser.passwordHash = await bcrypt.hash('sekret', 10);
+        const userToCreate = new Users(newUser);
         const savedUser = await userToCreate.save();
 
         const updateData = {

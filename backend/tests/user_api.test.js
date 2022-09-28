@@ -1,8 +1,13 @@
+//import supertest, mongoose, and app for testing 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 
+//create an api with supertest.
 const api = supertest(app)
+
+//import bcrypt
+const bcrypt = require('bcrypt');
 
 //import Models
 const Users = require("../models/users");
@@ -18,7 +23,6 @@ const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialTasks = testHelper.initialTasks;
 const initialBugs = testHelper.initialBugs;
-const additionalUsers = testHelper.additionalUsers;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -27,6 +31,7 @@ beforeEach(async () => {
   await Tasks.deleteMany({});
   await Bugs.deleteMany({});
   for (let user of initialUsers) {
+      user.passwordHash = await bcrypt.hash('sekret', 10)
       let userObject = new Users(user)
       await userObject.save()
   }
@@ -129,14 +134,17 @@ describe('user POST Method', () => {
       //new user to be added
       const newUser =  {
           name: "User 3",
+          username: "UserName 12",
+          password: "Password1",
       };
-      await api.post('/api/users').send(newUser)
-      //test if the user count is increased by 1.
-      const response = await api.get('/api/users');
-      expect(response.body).toHaveLength(initialUsers.length + 1)
-      //test if the newly added user name is in the array
-      const names = response.body.map((object) => object.name);
-      expect(names).toContain('User 3');
+      const createdUserResponseBody = await api.post('/api/users').send(newUser);
+
+      const allUsers = await Users.find({});
+      expect(allUsers).toHaveLength(initialUsers.length + 1);
+      
+      const createdUserForCheck = await Users.findById(createdUserResponseBody.body.id);
+      expect(createdUserForCheck.name).toEqual(newUser.name);
+      expect(createdUserForCheck.username).toEqual(newUser.username);
     }, 10000);
 
     //
@@ -205,6 +213,39 @@ describe('user PUT Method', () => {
       expect(updatedUser.tasks).toHaveLength(adminUser.tasks.length - 2);
       expect(updatedUser.bugs).toHaveLength(adminUser.bugs.length - 4);
 
+    }, 10000);
+
+    //test PUT method to see if a user can be updated
+    test('a user leaves task, and bugs', async () => {
+      //get the admin user of project 1, admin user leaves first task and first bug.
+      const adminUser = await Users.findOne({name: initialUsers[1].name});
+      const firstTaskToCheck = await Tasks.findOne({name: initialTasks[0].name});
+      const firstBugToCheck = await Bugs.findOne({name: initialBugs[0].name});
+
+      //constants for checking   
+      const adminUserId = adminUser.id;
+
+      //update Data
+      const updatedData = {
+        leaveTask: adminUser.tasks[0],
+        leaveBug: adminUser.bugs[0]
+      }
+
+      //updated user Name
+      await api.put(`/api/users/${adminUserId}`).send(updatedData);
+
+      //get updatedUser Information
+      const updatedUser = await Users.findById(adminUser._id);
+      const updatedTask =  await Tasks.findById(firstTaskToCheck._id);
+      const updatedBug =  await Bugs.findById(firstBugToCheck._id);
+
+      //check if the tasks and bugs have remove user from their assigned list.
+      expect(updatedTask.assigned).toHaveLength(firstTaskToCheck.assigned.length - 1);
+      expect(updatedBug.assigned).toHaveLength(firstBugToCheck.assigned.length - 1);
+
+      //check if user have project's tasks and bugs removed from their tasks and bugs list.
+      expect(updatedUser.tasks).toHaveLength(adminUser.tasks.length - 1);
+      expect(updatedUser.bugs).toHaveLength(adminUser.bugs.length - 1);
     }, 10000);
 })
 

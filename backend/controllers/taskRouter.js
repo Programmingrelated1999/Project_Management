@@ -50,6 +50,7 @@ taskRouter.put("/:id", async(request, response) => {
     taskToUpdate.name = request.body.name? request.body.name : taskToUpdate.name;
     taskToUpdate.description = request.body.description? request.body.description : taskToUpdate.description;
     taskToUpdate.endDate = request.body.endDate? request.body.endDate : taskToUpdate.endDate;
+    taskToUpdate.status = request.body.status? request.body.status: taskToUpdate.status;
 
     //if there are any assigned - linking data, update the assigned list in the task along with updating the tasks of the users to include the current task.
     if(request.body.assigned){
@@ -71,7 +72,6 @@ taskRouter.put("/:id", async(request, response) => {
         }
         for(let userId of unique){
             const userToUpdate = await Users.findById(userId);
-            //console.log("The user can be retrieved from the unique array");
 
             if(userToUpdate.tasks.includes(taskToUpdate.id)) {                
                     console.log("needs to remove", userToUpdate.name);

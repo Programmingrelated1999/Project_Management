@@ -46,7 +46,12 @@ const projectSchema = new mongoose.Schema({
   invites: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-  }]
+  }],
+  status:{
+    type: Boolean,
+    require: true,
+    default: false,
+  }
 });
 
 //setSchema

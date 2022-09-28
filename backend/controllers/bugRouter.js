@@ -51,6 +51,7 @@ bugRouter.put("/:id", async(request, response) => {
     bugToUpdate.name = request.body.name? request.body.name : bugToUpdate.name;
     bugToUpdate.description = request.body.description? request.body.description : bugToUpdate.description;
     bugToUpdate.endDate = request.body.endDate? request.body.endDate : bugToUpdate.endDate;
+    bugToUpdate.status = request.body.status? request.body.status: bugToUpdate.status;
 
     //if there are any assigned - linking data, update the assigned list in the bug along with updating the bugs of the users to include the current bug.
     if(request.body.assigned){

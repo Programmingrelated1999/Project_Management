@@ -1,8 +1,13 @@
+//import supertest, mongoose, and app for testing 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../app');
+const app = require('../app')
 
+//create an api with supertest.
 const api = supertest(app)
+
+//import bcrypt
+const bcrypt = require('bcrypt');
 
 //import Models
 const Bugs = require("../models/bugs");
@@ -24,6 +29,7 @@ beforeEach(async () => {
     await Projects.deleteMany({});
     await Bugs.deleteMany({});
     for (let user of initialUsers) {
+        user.passwordHash = await bcrypt.hash('sekret', 10)
         let userObject = new Users(user)
         await userObject.save()
     }
@@ -98,6 +104,7 @@ describe('bug GET methods', () => {
     //use the first user's id to get a user by id request, if the response is the same user(check by name), test pass
     const bugSingleResponse = await api.get(`/api/bugs/${idToCheck}`);
     expect(bugSingleResponse.body.name).toEqual(bugNameCheck);
+    expect(bugSingleResponse.body.status).toEqual(false);
     });
 })
 
@@ -178,6 +185,25 @@ describe('bug PUT Method', () => {
       expect(updatedBug.description).toEqual(updateBug.description);
     });
 
+    //test PUT bug method to make sure a bug can status can be updated.
+    test('a bug status can be updated', async () => {
+      //get first bug and id for PUT link
+      const bug = await Bugs.findOne({name: initialBugs[0].name});
+      const id = bug.id;
+    
+      //status is set to true
+      const updateBug = {
+        status: true,
+      }
+
+      //API method
+      await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+
+      //check if updated Bug status is true
+      const updatedBug = await Bugs.findById(id);
+      expect(updatedBug.status).toEqual(true);
+    });
+
     //test PUT bug method to make sure that a bug is successfully updated with data without linking.
     test('a bug is successfully updated with the user linking', async () => {
         //get first bug and id for PUT link, store the initial Length of assigned list for validation of the updated assigned list.
@@ -187,6 +213,7 @@ describe('bug PUT Method', () => {
         //create new Users from additional users for adding users.
         let newUsersIdArray = [];
         for (let user of additionalUsers) {
+            user.passwordHash = await bcrypt.hash('sekret', 10);
             let userObject = new Users(user)
             const newUser = await userObject.save()
             newUsersIdArray = newUsersIdArray.concat(newUser._id);

@@ -29,6 +29,11 @@ const bugSchema = new mongoose.Schema({
         ref: "Project",
         required: true,
     },
+    status:{
+      type: Boolean,
+      require: true,
+      default: false,
+    }
 });
 
 //setSchema

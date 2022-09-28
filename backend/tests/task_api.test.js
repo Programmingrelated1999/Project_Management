@@ -1,8 +1,13 @@
+//import supertest, mongoose, and app for testing 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 
+//create an api with supertest.
 const api = supertest(app)
+
+//import bcrypt
+const bcrypt = require('bcrypt');
 
 //import Models
 const Tasks = require("../models/tasks");
@@ -24,6 +29,7 @@ beforeEach(async () => {
     await Projects.deleteMany({});
     await Tasks.deleteMany({});
     for (let user of initialUsers) {
+        user.passwordHash = await bcrypt.hash('sekret', 10)
         let userObject = new Users(user)
         await userObject.save()
     }
@@ -81,11 +87,13 @@ describe('task GET methods', () => {
     test('tasks are returned as json', async () => {
         await api.get('/api/tasks').expect(200).expect('Content-Type', /application\/json/)
     })
+
     //test if all tasks are returned
     test('all tasks are returned', async () => {
         const response = await api.get('/api/tasks')
         expect(response.body).toHaveLength(initialTasks.length);
     })
+
     //test GET user method by id
     test('a task is returned by id', async () => {
     //get all users and store the first user's id and name for checking
@@ -95,6 +103,7 @@ describe('task GET methods', () => {
     //use the first user's id to get a user by id request, if the response is the same user(check by name), test pass
     const taskSingleResponse = await api.get(`/api/tasks/${idToCheck}`);
     expect(taskSingleResponse.body.name).toEqual(taskNameCheck);
+    expect(taskSingleResponse.body.status).toEqual(false);
     });
 })
 
@@ -175,6 +184,25 @@ describe('task PUT Method', () => {
       expect(updatedTask.description).toEqual(updateTask.description);
     });
 
+    //test PUT task method to make sure a task can status can be updated.
+    test('a task status can be updated', async () => {
+      //get first task and id for PUT link
+      const task = await Tasks.findOne({name: initialTasks[0].name});
+      const id = task.id;
+    
+      //status is set to true
+      const updateTask = {
+        status: true,
+      }
+
+      //API method
+      await api.put(`/api/tasks/${task.id}`).send(updateTask);
+
+      //check if updated Task status is true
+      const updatedTask = await Tasks.findById(id);
+      expect(updatedTask.status).toEqual(true);
+    });
+
     //test PUT task method to make sure that a task is successfully updated with data without linking.
     test('a task is successfully updated with the user linking', async () => {
         //get first task and id for PUT link, store the initial Length of assigned list for validation of the updated assigned list.
@@ -184,6 +212,7 @@ describe('task PUT Method', () => {
         //create new Users from additional users for adding users.
         let newUsersIdArray = [];
         for (let user of additionalUsers) {
+            user.passwordHash = await bcrypt.hash('sekret', 10);
             let userObject = new Users(user)
             const newUser = await userObject.save()
             newUsersIdArray = newUsersIdArray.concat(newUser._id);

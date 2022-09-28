@@ -1,6 +1,9 @@
 //create a userRouter
 const userRouter = require("express").Router();
 
+//import bcrypt
+const bcrypt = require('bcrypt');
+
 //import Helpers
 const { removeAUserFromTasks } = require("../helpers/taskHelper");
 const { removeAUserFromBugs } = require("../helpers/bugHelper");
@@ -25,9 +28,16 @@ userRouter.get("/:id", async (request, response) => {
 })
 
 //POST
-//create a new user only required name.
+//create a new user only required name, username, and password.
 userRouter.post("/", async (request, response) => {
-    const user = new Users({name: request.body.name, username: request.body.username});
+    //bcrypt setup, with salt rounds 10 and create a password hash
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(request.body.password, saltRounds);
+
+    //a new user model with name, username, and passwordHash
+    const user = new Users({name: request.body.name, username: request.body.username, passwordHash: passwordHash});
+
+    //save the user. 
     const savedUser = await user.save();
     response.json(savedUser);
 });
@@ -39,7 +49,22 @@ userRouter.put("/:id", async (request, response) => {
   user.name = request.body.name? request.body.name: user.name;
   user.username = request.body.username? request.body.username: user.username;
 
-  
+  //if user leave tasks
+  if(request.body.leaveTask){
+    const taskToUpdate = await Tasks.findById(request.body.leaveTask);
+    taskToUpdate.assigned = taskToUpdate.assigned.filter((taskUser) => String(taskUser) !== String(user._id));
+    await taskToUpdate.save();
+    user.tasks = user.tasks.filter((task) => String(task) !== String(taskToUpdate._id));
+  }
+
+  //if user leave bugs
+  if(request.body.leaveBug){
+    const bugToUpdate = await Bugs.findById(request.body.leaveBug);
+    bugToUpdate.assigned = bugToUpdate.assigned.filter((bugUser) => String(bugUser) !== String(user._id));
+    await bugToUpdate.save();
+    user.bugs = user.bugs.filter((bug) => String(bug) !== String(bugToUpdate._id));
+  }
+
   //if user Leaves Projects
   if(request.body.leaveProject){
     const projectToUpdate = await Projects.findById(request.body.leaveProject);
@@ -58,7 +83,6 @@ userRouter.put("/:id", async (request, response) => {
 
     await projectToUpdate.save();
   }
-
   const savedUser = await user.save();
   response.json(savedUser);
 });
