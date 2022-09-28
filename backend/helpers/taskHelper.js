@@ -7,7 +7,7 @@ const Bugs = require("../models/bugs");
 const removeAUserFromTasks = async(tasks, userId) => {
     tasks.forEach(async (task) => {
         const taskToUpdate = await Tasks.findById(task);
-        taskToUpdate.users = taskToUpdate.users.filter((taskUser) => String(taskUser) !== String(userId));
+        taskToUpdate.assigned = taskToUpdate.assigned.filter((taskUser) => String(taskUser) !== String(userId));
         await taskToUpdate.save();
     })
 }

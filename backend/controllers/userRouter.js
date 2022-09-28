@@ -1,8 +1,12 @@
+//create a userRouter
 const userRouter = require("express").Router();
-const userHelper = require("../helpers/userHelper");
-const taskHelper = require("../helpers/taskHelper");
-const { removeUsersFromTasks } = require("../helpers/taskHelper");
 
+//import Helpers
+const { removeAUserFromTasks } = require("../helpers/taskHelper");
+const { removeAUserFromBugs } = require("../helpers/bugHelper");
+const { removeAListOfTasksFromUser, removeAListOfBugsFromUser } = require("../helpers/userHelper");
+
+//import Models
 const Projects = require("../models/projects");
 const Users = require("../models/users");
 const Tasks = require("../models/tasks");
@@ -33,6 +37,28 @@ userRouter.post("/", async (request, response) => {
 userRouter.put("/:id", async (request, response) => {
   const user = await Users.findById(request.params.id);
   user.name = request.body.name? request.body.name: user.name;
+  user.username = request.body.username? request.body.username: user.username;
+
+  
+  //if user Leaves Projects
+  if(request.body.leaveProject){
+    const projectToUpdate = await Projects.findById(request.body.leaveProject);
+    projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(user._id));
+    projectToUpdate.admins = projectToUpdate.admins.filter((userElement) => String(userElement) !== String(user._id));
+    projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(user._id));
+
+    //find commont tasks,bugs between projects and users. The common list means that user is assigend to the project's tasks/bugs. Remove user from Tasks/bugs.
+    const commonTasksInProjectAndUser = projectToUpdate.tasks.filter(taskElement => user.tasks.includes(taskElement));
+    const commonBugsInProjectAndUser = projectToUpdate.bugs.filter(bugElement => user.bugs.includes(bugElement));
+    removeAUserFromTasks(commonTasksInProjectAndUser, user._id);
+    removeAUserFromBugs(commonBugsInProjectAndUser, user._id);
+    removeAListOfTasksFromUser(commonTasksInProjectAndUser, user);
+    removeAListOfBugsFromUser(commonBugsInProjectAndUser, user);    
+    user.projects = user.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
+
+    await projectToUpdate.save();
+  }
+
   const savedUser = await user.save();
   response.json(savedUser);
 });

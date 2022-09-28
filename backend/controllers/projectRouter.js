@@ -128,6 +128,7 @@ projectRouter.put("/:id", async(request, response) => {
       const userToRemove = await Users.findById(user);
       userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
       userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
+      
       projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
       projectToUpdate.admins = projectToUpdate.admins.filter((userElement) => String(userElement) !== String(userToRemove._id));
       projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
