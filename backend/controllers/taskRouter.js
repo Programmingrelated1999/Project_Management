@@ -123,12 +123,10 @@ taskRouter.put("/:id", async(request, response) => {
                 const userToUpdate = await Users.findById(userId);
 
                 if(userToUpdate.tasks.includes(taskToUpdate.id)) {                
-                        console.log("needs to remove", userToUpdate.name);
                         userToUpdate.tasks = userToUpdate.tasks.filter((task) => String(task) !== String(taskToUpdate._id));
                         taskToUpdate.assigned = taskToUpdate.assigned.filter((user) => String(user) !== String(userToUpdate._id));
                         await userToUpdate.save();
                 } else {
-                        console.log("needs to add", userToUpdate.name);
                         userToUpdate.tasks = userToUpdate.tasks.concat(taskToUpdate.id);
                         taskToUpdate.assigned = taskToUpdate.assigned.concat(userToUpdate.id);
                         await userToUpdate.save();

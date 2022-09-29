@@ -9,6 +9,9 @@ const api = supertest(app)
 //import bcrypt
 const bcrypt = require('bcrypt');
 
+//import jwt
+const jwt = require('jsonwebtoken');
+
 //import Models
 const Bugs = require("../models/bugs");
 const Projects = require("../models/projects");
@@ -22,6 +25,8 @@ const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialBugs = testHelper.initialBugs;
 const additionalUsers = testHelper.additionalUsers;
+
+let token;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -79,6 +84,13 @@ beforeEach(async () => {
     await usersAfterCreation[1].save();
     usersAfterCreation[2].bugs = usersAfterCreation[2].bugs.concat(bugIds);
     await usersAfterCreation[2].save();
+
+    const adminUser = await Users.findOne({name: initialUsers[1].name});
+    const userForToken = {
+        username: adminUser.name,
+        id: adminUser._id,
+    }
+    token = 'bearer ' + jwt.sign(userForToken, process.env.SECRET);
 });
 
 //Bug GET method
@@ -121,7 +133,7 @@ describe('bug POST Method', () => {
           project: project._id,
       };
       //post the bug
-      await api.post('/api/bugs').send(newBug)
+      await api.post('/api/bugs').send(newBug).set('Authorization', token);
       //test if the bugs count is increased by 1.
       const response = await api.get('/api/bugs');
       expect(response.body).toHaveLength(initialBugs.length + 1)
@@ -141,7 +153,7 @@ describe('bug POST Method', () => {
           project: project._id,
       };
       //post the bug
-      await api.post('/api/bugs').send(newBug)
+      await api.post('/api/bugs').send(newBug).set('Authorization', token);
       //test if the newly added bug contains createdDate variable which is in Date format
       const bug = await Bugs.findOne({name: "Bug 5"});
       expect(bug.createdDate).toBeInstanceOf(Date);
@@ -158,7 +170,7 @@ describe('bug POST Method', () => {
           project: project._id,
       };
       //post the bug
-      await api.post('/api/bugs').send(newBug)
+      await api.post('/api/bugs').send(newBug).set('Authorization', token);
       //test if the newly added bug contains createdDate variable which is in Date format
       const bug = await Bugs.findOne({name: "Bug 5"});
       expect(bug.createdDate).toBeInstanceOf(Date);
@@ -178,7 +190,7 @@ describe('bug PUT Method', () => {
         description: "Bug Description 6",
       }
 
-      await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+      await api.put(`/api/bugs/${bug.id}`).send(updateBug).set('Authorization', token);
 
       const updatedBug = await Bugs.findById(id);
       expect(updatedBug.name).toEqual(updateBug.name);
@@ -197,7 +209,7 @@ describe('bug PUT Method', () => {
       }
 
       //API method
-      await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+      await api.put(`/api/bugs/${bug.id}`).send(updateBug).set('Authorization', token);
 
       //check if updated Bug status is true
       const updatedBug = await Bugs.findById(id);
@@ -214,8 +226,8 @@ describe('bug PUT Method', () => {
         let newUsersIdArray = [];
         for (let user of additionalUsers) {
             user.passwordHash = await bcrypt.hash('sekret', 10);
-            let userObject = new Users(user)
-            const newUser = await userObject.save()
+            let userObject = new Users(user);
+            const newUser = await userObject.save();
             newUsersIdArray = newUsersIdArray.concat(newUser._id);
         }
 
@@ -225,7 +237,7 @@ describe('bug PUT Method', () => {
             assigned: bug.assigned.concat(newUsersIdArray)
         }
 
-        const updatedBugResponse = await api.put(`/api/bugs/${bug.id}`).send(updateBug);
+        const updatedBugResponse = await api.put(`/api/bugs/${bug.id}`).send(updateBug).set('Authorization', token);
         const updatedBugAssign = updatedBugResponse.body.assigned.map((user) => String(user));
         expect(updatedBugAssign).toHaveLength(bug.assigned.length + 2);
         
@@ -245,7 +257,7 @@ describe('bug DELETE Method', () => {
       const bugToDelete = await Bugs.findOne({name: initialBugs[0].name});
 
       //make DELETE request and get all the bugs.
-      await api.delete(`/api/bugs/${bugToDelete.id}`);
+      await api.delete(`/api/bugs/${bugToDelete.id}`).set('Authorization', token);
       const bugs = await Bugs.find({});
 
       //the bugs list should have length one lower than the initial bugs length since one got deleted.
@@ -263,7 +275,7 @@ describe('bug DELETE Method', () => {
       const projectId = bugToDelete.project;
 
       //make a delete request.
-      await api.delete(`/api/bugs/${bugToDelete.id}`);
+      await api.delete(`/api/bugs/${bugToDelete.id}`).set('Authorization', token);
 
       //check if the project contains the bug. It should not contain since the bug got deleted. 
       const projectToCheck = await Projects.findById(projectId);
