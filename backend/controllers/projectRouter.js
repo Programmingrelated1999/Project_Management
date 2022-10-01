@@ -1,11 +1,25 @@
 //create projectRouter from express Router module
 const projectRouter = require("express").Router();
 
+//require jwt
+const jwt = require('jsonwebtoken');
+
 //require Modals
 const Users = require("../models/users");
 const Projects = require("../models/projects");
 const Tasks = require("../models/tasks");
 const Bugs = require("../models/bugs");
+
+const {isUserInvited, isUserClient, containsAdmin, isUserCreator} = require("../helpers/projecthelper");
+
+//get token function
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7)
+  }
+  return null
+}
 
 //GET ALL
 projectRouter.get("/", (request, response) => {
@@ -26,46 +40,15 @@ projectRouter.get("/:id", (request, response) => {
 //check if there are any invites, get the user from the invites and save it. 
 //save the project into MongoDB.
 projectRouter.post("/", async (request, response) => {
-  //get the user who is going to create the project by id from request.body.creator. Create inviteList for storing users who are invited for storing created project id.
-  const creator = await Users.findById(request.body.creator);
-  let inviteList = [];
 
-  //define the project. 
-  const project = new Projects({
-    name: request.body.name,
-    description: request.body.description,
-    createdDate: Date.now(),
-    creator: creator.id,
-  });
-
-  //if there are any users invited from the project, then saved the list of users in the invite list.
-  if(request.body.invites){
-    project.invites = request.body.invites;
-    inviteList = request.body.invites;
+  const token = getTokenFrom(request);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  //if decode not successful, token is not valid.
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
   }
-
-  //save the project and set the savedProject with the returned data. 
-  const savedProject = await project.save();
-
-  //saved the created project to the creator's projects
-  creator.projects = creator.projects.concat(savedProject._id);
-  await creator.save();
-
-  //save the project to the invited user's project invites list.
-  for(let user of inviteList){
-    let invitedUser = await Users.findById(user);
-    invitedUser.projectInvites = invitedUser.projectInvites.concat(savedProject._id);
-    await invitedUser.save();
-  }
-
-  //returned the created project
-  response.json(savedProject);
-});
-
-//PUT
-projectRouter.post("/", async (request, response) => {
-  //get the user who is going to create the project by id from request.body.creator. Create inviteList for storing users who are invited for storing created project id.
-  const creator = await Users.findById(request.body.creator);
+  //if token is valid, get user and the current project.
+  const creator = await Users.findById(decodedToken.id);
   let inviteList = [];
 
   //define the project. 
@@ -107,38 +90,101 @@ projectRouter.put("/:id", async(request, response) => {
   //get the project to be updated and store it in projectToUpdate variable.
   const projectToUpdate = await Projects.findById(request.params.id);
 
-  //update the basics of the project
-  projectToUpdate.name = request.body.name? request.body.name: projectToUpdate.name;
-  projectToUpdate.description = request.body.description? request.body.description: projectToUpdate.description;
-
-  //if there are any addInvites then add them to the invite list.
-  if(request.body.addInvites){
-    for(let user of request.body.addInvites){
-      const userToUpdate = await Users.findById(user);
-      userToUpdate.projectInvites = userToUpdate.projectInvites.concat(projectToUpdate._id);
-      projectToUpdate.invites = projectToUpdate.invites.concat(userToUpdate._id);
-      await userToUpdate.save();
-    }
+  const token = getTokenFrom(request);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  //if decode not successful, token is not valid.
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
   }
+  //if token is valid, get user and the current project.
+  const updater = await Users.findById(decodedToken.id);
+  //check user role: user must be admin or owner to create task.
+  const isUpdaterCreator = String(projectToUpdate.creator) === String(updater._id)? true: false;
+  const isUpdaterAdmin = projectToUpdate.admins.includes(updater._id)? true: false;
 
-  //if there are any remove members, for each memeber remove project from projectInvites and projects.
-  //remove member id from project developers, admins, clients, invites
-  if(request.body.removeUsers){
-    for(let user of request.body.removeUsers){
-      const userToRemove = await Users.findById(user);
-      userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
-      userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
-      
-      projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
-      projectToUpdate.admins = projectToUpdate.admins.filter((userElement) => String(userElement) !== String(userToRemove._id));
-      projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
-      projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
-      await userToRemove.save();
+  if(isUpdaterCreator || isUpdaterAdmin){
+    //update the basics of the project
+    projectToUpdate.name = request.body.name? request.body.name: projectToUpdate.name;
+    projectToUpdate.description = request.body.description? request.body.description: projectToUpdate.description;
+
+    //if there are any addInvites then add them to the invite list.
+    if(request.body.addInvites){
+      for(let user of request.body.addInvites){
+        const userToUpdate = await Users.findById(user);
+        userToUpdate.projectInvites = userToUpdate.projectInvites.concat(projectToUpdate._id);
+        projectToUpdate.invites = projectToUpdate.invites.concat(userToUpdate._id);
+        await userToUpdate.save();
+      }
     }
-  }
 
-  const savedProject = await projectToUpdate.save();
-  response.json(savedProject);
+    //if there are any remove members, for each memeber remove project from projectInvites and projects.
+    //remove member id from project developers, admins, clients, invites
+    if(request.body.removeUsers){
+      if(request.body.removeUsers.includes(projectToUpdate.creator)){
+        response.status(401).json({error: "Creator cannot be removed"});
+      }
+      if(isUpdaterCreator){
+        for(let user of request.body.removeUsers){
+          const userToRemove = await Users.findById(user);
+          //remove all
+          projectToUpdate.admins = projectToUpdate.admins.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          //remove project from usrs
+          userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
+          userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
+          //save the user
+          await userToRemove.save();
+        }
+      } else{
+        if(containsAdmin(request.body.removeUsers, projectToUpdate.admins)){
+          response.status(401).json({error: "Admin cannot remove another Admin"});
+        }
+        for(let user of request.body.removeUsers){
+          const userToRemove = await Users.findById(user);
+          //remove all
+          projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          //remove project from usrs
+          userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
+          userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
+          //save the user
+          await userToRemove.save();
+        }
+      }
+    }
+
+    const savedProject = await projectToUpdate.save();
+    response.json(savedProject);
+  } else {
+    response.status(401).json({error: "User is not authorized to update the project"});
+  }
+})
+
+//check status
+projectRouter.put("/:id/changeStatus", async(request, response) => {
+  //get the project to be updated and store it in projectToUpdate variable.
+  const projectToUpdate = await Projects.findById(request.params.id);
+  //figure out token
+  const token = getTokenFrom(request);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  //if decode not successful, token is not valid.
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  //if token is valid, get the user
+  const updater = await Users.findById(decodedToken.id);
+
+  //check if the user is client or is invite list
+  if(isUserClient(projectToUpdate, updater) || isUserInvited(projectToUpdate, updater)){
+    return response.status(401).json({error: "User must be part of the development team to work on the project"});
+  } else{
+    projectToUpdate.status = request.body.status;
+    const updatedProject = await projectToUpdate.save();
+  }
+  response.json(projectToUpdate);
 })
 
 projectRouter.put("/:id/:userId", async(request, response) => {
@@ -175,62 +221,76 @@ projectRouter.put("/:id/:userId", async(request, response) => {
 //get project by the id in the link. Then delete each tasks and bugs from the project.
 //get all user types, delete the project from all user types's projects and projectInvites.
 projectRouter.delete("/:id", async (request, response) => {
+  //get the project to be deleted and store it in project variable.
   const project = await Projects.findById(request.params.id);
+  //figure out token
+  const token = getTokenFrom(request);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  //if decode not successful, token is not valid.
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  //if token is valid, get user and the current project.
+  const deleter = await Users.findById(decodedToken.id);
 
-  //delete task
-  for(let task of project.tasks){
-    const taskToDelete = await Tasks.findById(task);
-    for(let user of taskToDelete.assigned){
-      const userToUpdate = await Users.findById(user);
-      userToUpdate.tasks = userToUpdate.tasks.filter((taskElement) => String(taskElement) !== String(taskToDelete._id));
-      await userToUpdate.save();
-    }
-    await taskToDelete.remove();
-  };
+  if(!isUserCreator(project, deleter._id)){
+    return response.status(401).json({error: "Not Authorized"});
+  }
 
-  //delete bug
-  for(let bug of project.bugs){
-    const bugToDelete = await Bugs.findById(bug);
-    for(let user of bugToDelete.assigned){
-      const userToUpdate = await Users.findById(user);
-      userToUpdate.bugs = userToUpdate.bugs.filter((bugElement) => String(bugElement) !== String(bugToDelete._id));
-      await userToUpdate.save();
-    }
-    await bugToDelete.remove();
-  };
+      //delete task
+      for(let task of project.tasks){
+        const taskToDelete = await Tasks.findById(task);
+        for(let user of taskToDelete.assigned){
+        const userToUpdate = await Users.findById(user);
+        userToUpdate.tasks = userToUpdate.tasks.filter((taskElement) => String(taskElement) !== String(taskToDelete._id));
+        await userToUpdate.save();
+        }
+        await taskToDelete.remove();
+    };
 
-  //delete creator
-  const creator = await Users.findById(project.creator);
-  creator.projects = await creator.projects.filter((projectElement) => String(projectElement) !== String(project._id));
-  await creator.save();
+    //delete bug
+    for(let bug of project.bugs){
+        const bugToDelete = await Bugs.findById(bug);
+        for(let user of bugToDelete.assigned){
+            const userToUpdate = await Users.findById(user);
+            userToUpdate.bugs = userToUpdate.bugs.filter((bugElement) => String(bugElement) !== String(bugToDelete._id));
+            await userToUpdate.save();
+        }
+        await bugToDelete.remove();
+    };
 
-  //delete admin
-  await project.admins.forEach(async (admin) => {
-    const adminToUpdate = await Users.findById(admin);
-    adminToUpdate.projects = await adminToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
-    await adminToUpdate.save();
-  })
+    //delete creator
+    const creator = await Users.findById(project.creator);
+    creator.projects = await creator.projects.filter((projectElement) => String(projectElement) !== String(project._id));
+    await creator.save();
 
-  //delete developers
-  await project.developers.forEach(async (developer) => {
-    const developerToUpdate = await Users.findById(developer);
-    developerToUpdate.projects = await developerToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
-    await developerToUpdate.save();
-  })
+    //delete admin
+    await project.admins.forEach(async (admin) => {
+        const adminToUpdate = await Users.findById(admin);
+        adminToUpdate.projects = await adminToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
+        await adminToUpdate.save();
+    })
 
-  //delete clients
-  await project.clients.forEach(async (client) => {
-    const clientToUpdate = await Users.findById(client);
-    clientToUpdate.projects = await clientToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
-    await clientToUpdate.save();
-  })
+    //delete developers
+    await project.developers.forEach(async (developer) => {
+        const developerToUpdate = await Users.findById(developer);
+        developerToUpdate.projects = await developerToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
+        await developerToUpdate.save();
+    })
 
-  //delete invites
-  await project.invites.forEach(async (invite) => {
-    const inviteToUpdate = await Users.findById(invite);
-    inviteToUpdate.projectInvites = await inviteToUpdate.projectInvites.filter((projectElement) => String(projectElement) !== String(project._id));
-    await inviteToUpdate.save();
-  })
+    //delete clients
+    await project.clients.forEach(async (client) => {
+        const clientToUpdate = await Users.findById(client);
+        clientToUpdate.projects = await clientToUpdate.projects.filter((projectElement) => String(projectElement) !== String(project._id));
+        await clientToUpdate.save();
+    })
+
+    //delete invites
+    await project.invites.forEach(async (invite) => {
+        const inviteToUpdate = await Users.findById(invite);
+        inviteToUpdate.projectInvites = await inviteToUpdate.projectInvites.filter((projectElement) => String(projectElement) !== String(project._id));
+        await inviteToUpdate.save();
+    })
 
   //remove the project
   const removedProject = await project.remove();

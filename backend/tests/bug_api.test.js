@@ -87,7 +87,7 @@ beforeEach(async () => {
 
     const adminUser = await Users.findOne({name: initialUsers[1].name});
     const userForToken = {
-        username: adminUser.name,
+        username: adminUser.username,
         id: adminUser._id,
     }
     token = 'bearer ' + jwt.sign(userForToken, process.env.SECRET);

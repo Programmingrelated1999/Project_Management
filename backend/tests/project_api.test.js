@@ -9,6 +9,9 @@ const api = supertest(app)
 //import bcrypt
 const bcrypt = require('bcrypt');
 
+//import jwt
+const jwt = require('jsonwebtoken');
+
 //import Models
 const Tasks = require("../models/tasks");
 const Projects = require("../models/projects");
@@ -23,6 +26,9 @@ const initialUsers = testHelper.initialUsers;
 const initialProjects = testHelper.initialProjects;
 const initialTasks = testHelper.initialTasks;
 const initialBugs = testHelper.initialBugs;
+
+//initial token
+let token;
 
 //setting data before each test is run. 
 beforeEach(async () => {
@@ -100,6 +106,13 @@ beforeEach(async () => {
     usersAfterCreation[2].bugs = usersAfterCreation[2].bugs.concat(bugIds);
     await usersAfterCreation[1].save();
     await usersAfterCreation[2].save();
+
+    const creatorUser = await Users.findOne({name: initialUsers[0].name});
+    const userToken = {
+        username: creatorUser.username,
+        id: creatorUser._id
+    }
+    token = 'bearer ' + jwt.sign(userToken, process.env.SECRET);
 }, 10000);
 
 //Task GET method
@@ -130,7 +143,6 @@ describe('project GET methods', () => {
 
 //Project POST METHOD
 describe('project POST Method', () => {
-    
     //test POST task method to make sure that a project is successfully created without invite list.
     test('a project is successfully added', async () => {
       //get first creator for the task
@@ -140,12 +152,11 @@ describe('project POST Method', () => {
       const newProject =  {
           name: "Project 3",
           description: "Project Description 3",
-          creator: creator._id,
           createdDate: Date.now()
       };
 
       //post the project
-      const createdProjectResponse = await api.post('/api/projects').send(newProject);
+      const createdProjectResponse = await api.post('/api/projects').send(newProject).set('Authorization', token);
 
       //test if the projects count is increased by 1.
       const allProjects = await Projects.find({});
@@ -159,19 +170,16 @@ describe('project POST Method', () => {
 
     //test POST task method to make sure that a project is successfully created without invite list and the creator projects include the project
     test('a project added, the creator must be updated to include project', async () => {
-      //get first creator for the task
-      const creator = await Users.findOne({name: initialUsers[0].name});
 
       //new project to be added
       const newProject =  {
           name: "Project 3",
           description: "Project Description 3",
-          creator: creator._id,
           createdDate: Date.now()
       };
 
       //post the project
-      const createdProjectResponse = await api.post('/api/projects').send(newProject);
+      const createdProjectResponse = await api.post('/api/projects').send(newProject).set('Authorization', token);
       //get the user again after creation
       const creatorCheck = await Users.findOne({name: initialUsers[0].name});
       //since the creatorCheck.projects contains objects by id will need to transform them into strings for comparison
@@ -182,7 +190,6 @@ describe('project POST Method', () => {
     //test POST task method to make sure that a project is successfully created with invite list and invites have the project saved in their projectInvites.
     test('a project added with invites, invites must be included and invites should have created project id', async () => {
       //get first creator for the task, get next 2 users and add them to the invite list
-      const creator = await Users.findOne({name: initialUsers[0].name});
       const invite1 = await Users.findOne({name: initialUsers[1].name});
       const invite2 = await Users.findOne({name: initialUsers[2].name});
       const inviteList = [invite1._id, invite2._id];
@@ -191,14 +198,13 @@ describe('project POST Method', () => {
       const newProject =  {
           name: "Project 3",
           description: "Project Description 3",
-          creator: creator._id,
           createdDate: Date.now(),
           invites: inviteList
       };
 
       //post the project, get the response with the response.id(which is a string) get the object created.
-      const createdProjectResponse = await api.post('/api/projects').send(newProject);
-      const postedProjectForCheck = await Projects.findById(createdProjectResponse.body.id)
+      const createdProjectResponse = await api.post('/api/projects').send(newProject).set('Authorization', token);
+      const postedProjectForCheck = await Projects.findById(createdProjectResponse.body.id);
 
       //check the objects, cannot let object comparison with toContain, use toContainEqual
       for(let invite of inviteList){
@@ -225,7 +231,7 @@ describe('project PUT Method', () => {
         description: "Project Description 6",
       }
 
-      await api.put(`/api/projects/${project.id}`).send(updateProject);
+      await api.put(`/api/projects/${project.id}`).send(updateProject).set('Authorization', token);
 
       const updatedProject = await Projects.findById(id);
       expect(updatedProject.name).toEqual(updateProject.name);
@@ -251,7 +257,7 @@ describe('project PUT Method', () => {
 
         //response is to get the project. Check if the invites conatin savedUser.
         //userAfterUpdate to check if the user contains project in projectInvitees.
-        const response = await api.put(`/api/projects/${projectId}`).send(updateData);
+        const response = await api.put(`/api/projects/${projectId}`).send(updateData).set('Authorization', token);
         const userAfterUpdate = await Users.findOne({name: testHelper.additionalUsers[0].name});
         expect(response.body.invites).toContain(savedUser.id);
         expect(userAfterUpdate.projectInvites).toContainEqual(project._id);
@@ -270,7 +276,7 @@ describe('project PUT Method', () => {
         removeUsers: [userToDeleteAdmin._id, userToDeleteDeveloper._id, userToDeleteClient._id]
       }
       //api method
-      const response = await api.put(`/api/projects/${project._id}`).send(updateData);
+      const response = await api.put(`/api/projects/${project._id}`).send(updateData).set('Authorization', token);
 
       //check if the admins, developes, and clients count got reduced by 1.
       expect(response.body.admins).toHaveLength(project.admins.length - 1);
@@ -291,7 +297,7 @@ describe('project PUT Method', () => {
       }
 
       //make a PUT request, current user role is client, should be developer after update.
-      await api.put(`/api/projects/${project.id}/${user.id}`).send(updateData);
+      await api.put(`/api/projects/${project.id}/${user.id}`).send(updateData).set('Authorization', token);
 
       //find updatedproject, check if developers increased by 1 and clients decrease by 1.
       const updatedProject = await Projects.findById(project.id);
@@ -307,10 +313,25 @@ describe('project DELETE Method', () => {
     test('a project is successfully deleted', async () => {
         const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
         
-        await api.delete(`/api/projects/${projectToDelete.id}`);
+        await api.delete(`/api/projects/${projectToDelete.id}`).set('Authorization', token).set('Authorization', token);
 
         const allProjects = await Projects.find({});
         expect(allProjects).toHaveLength(initialProjects.length-1);
+    }, 10000);
+
+    //test DELETE task method to make sure that unauthorized users cannot delete, will return an error code.
+    test('a project is not deleted if not authorized', async () => {
+        const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
+
+        const adminUser = await Users.findOne({name: initialUsers[1].name});
+        const adminToken = {
+            username: adminUser.username,
+            id: adminUser._id
+        }
+        let unauthorizedToken = 'bearer ' + jwt.sign(adminToken, process.env.SECRET);
+        
+        const response = await api.delete(`/api/projects/${projectToDelete.id}`).set('Authorization', unauthorizedToken);
+        expect(response.status).toEqual(401);
     }, 10000);
 
     //test DELETE task method to make sure that a project is successfully deleted.
@@ -327,7 +348,7 @@ describe('project DELETE Method', () => {
         userList = userList.concat(projectToDelete.invites);
         
         //delete request
-        await api.delete(`/api/projects/${projectToDelete.id}`);
+        await api.delete(`/api/projects/${projectToDelete.id}`).set('Authorization', token);
 
         //for user of userList find the user and get the user's projects and projectsInvites, they should not have the deleted project id
         for(let user of userList){
@@ -345,7 +366,7 @@ describe('project DELETE Method', () => {
         const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
         
         //delete request
-        await api.delete(`/api/projects/${projectToDelete.id}`);
+        await api.delete(`/api/projects/${projectToDelete.id}`).set('Authorization', token);
 
         //get all tasks, it will be reduced by 2 since 2 were deleted.
         const allTasks = await Tasks.find({});
@@ -358,7 +379,7 @@ describe('project DELETE Method', () => {
         const projectToDelete = await Projects.findOne({name: initialProjects[0].name});
         
         //delete request
-        await api.delete(`/api/projects/${projectToDelete.id}`);
+        await api.delete(`/api/projects/${projectToDelete.id}`).set('Authorization', token);
 
         //get all bugs, it will be reduced to 0 since all bugs are in first project.
         const allBugs = await Bugs.find({});

@@ -1,14 +1,32 @@
-//Import CSS
-import './App.css'
+//Import
+import React from "react";
 
-//Import Components
+//Hooks
+import useToken from "./hooks/useToken";
+
+//Components
 import NavBar from './components/NavBar'
+import LoginPage from './components/Login/LoginPage';
+
+//CSS
+import './App.css'
 
 //App Component
 function App() {
+  const {token, setToken, resetToken} = useToken();
+
+  const logout = () => {
+    resetToken();
+  }
+
+  //if token is null, then render to login page
+  if(!token) {
+    return <LoginPage setToken={setToken}/>
+  }
+
   return (
     <div className="App">
-      <NavBar />
+      <NavBar logout={logout}/>
     </div>
   )
 }

@@ -16,9 +16,13 @@ const Tasks = require("../models/tasks");
 const Bugs = require("../models/bugs");
 
 //GET ALL
-userRouter.get("/", async (request, response) => {
-  const allUsers = await Users.find({});
-  response.json(allUsers);
+userRouter.get("/", async (request, response, next) => {
+  try{  
+    const allUsers = await Users.find({});
+    response.json(allUsers);
+  } catch(exception){
+    next(exception);
+  }
 })
 
 //GET ONE
