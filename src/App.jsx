@@ -8,6 +8,22 @@ import useToken from "./hooks/useToken";
 import NavBar from './components/NavBar'
 import LoginPage from './components/Login/LoginPage';
 
+//import Redux
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+
+import currentUserReducer from "./reducers/currentUserReducer";
+
+const store = configureStore({
+  reducer: {
+    currentUser: currentUserReducer
+  }
+})
+
+currentUserService.getUser().then(currentUser =>
+    store.dispatch(setCurrentUser(currentUser))
+)
+
 //CSS
 import './App.css'
 
@@ -26,7 +42,9 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar logout={logout}/>
+      <Provider store = {store}>
+        <NavBar logout={logout}/>
+      </Provider>
     </div>
   )
 }
