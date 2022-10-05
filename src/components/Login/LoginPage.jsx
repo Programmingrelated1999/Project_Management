@@ -23,7 +23,7 @@ const LoginPage = ({setToken}) => {
         }
         try{
             const data = await loginService(userInfo);
-            setToken({token: data.token});
+            setToken({token: data.token, id: data.id});
             setUsername('');
             setUserPassword('');
         } catch (exception){

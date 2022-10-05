@@ -27,8 +27,8 @@ userRouter.get("/", async (request, response, next) => {
 
 //GET ONE
 userRouter.get("/:id", async (request, response) => {
-  const userToReturn = await Users.findById(request.params.id);
-  response.json(userToReturn);
+  const userToReturn = await Users.findById(request.params.id).populate('projectInvites', {name: 1, description: 1}).populate({path: 'tasks', populate: { path: 'project', select: ['name']}});
+  response.json(userToReturn)
 })
 
 //POST
@@ -87,6 +87,30 @@ userRouter.put("/:id", async (request, response) => {
 
     await projectToUpdate.save();
   }
+
+  if(request.body.acceptInvite){
+    try{
+      const acceptInviteProject = await Projects.findById(request.body.acceptInvite);
+      acceptInviteProject.invites = acceptInviteProject.invites.filter((userElement) => String(userElement) !== String(user._id));
+      user.projectInvites = user.projectInvites.filter((projectElement) => String(projectElement) !== String(acceptInviteProject._id));
+      acceptInviteProject.developers = acceptInviteProject.developers.concat(user._id);
+      user.projects = user.projects.concat(acceptInviteProject._id);
+      await acceptInviteProject.save();
+    }catch (exception){
+      response.status(401).json({error: "Project cannot be found"});
+    }
+  }
+  if(request.body.rejectInvite){
+    try{
+      const rejectInviteProject = await Projects.findById(request.body.rejectInvite);
+      rejectInviteProject.invites = rejectInviteProject.invites.filter((userElement) => String(userElement) !== String(user._id));
+      user.projectInvites = user.projectInvites.filter((projectElement) => String(projectElement) !== String(acceptInviteProject._id));
+      await rejectInviteProject.save();
+      } catch(exception) {
+      response.status(401).json({error: "Project cannot be found"});
+    }
+  }
+  
   const savedUser = await user.save();
   response.json(savedUser);
 });

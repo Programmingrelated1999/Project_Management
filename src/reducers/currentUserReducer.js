@@ -1,15 +1,24 @@
-//Initial States
-const initialState = [];
+import { createSlice } from "@reduxjs/toolkit"
 
-//Form Reducers
-//Action type is "New_Questions, append the new question to the state.question array"
-const currentUserReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case " ":
-      return [...state, action.data];
-    default:
-      return state;
-  }
-}
+const currentUserSlice = createSlice({
+  name: 'currentUser',
+  initialState: {},
+  reducers: {
+    setCurrentUser(state, action) {
+      state.name = action.payload.name;
+      state.username = action.payload.username;
+      state.bio = action.payload.bio;
+      state.id = action.payload.id;
+      state.tasks = action.payload.tasks;
+      state.bugs = action.payload.bugs;
+      state.projects = action.payload.projects;
+      state.projectInvites = action.payload.projectInvites;
+    },
+    logout(state = initialState, action){
+    }
+  },
+})
 
-export default currentUserReducer;
+export const {setCurrentUser, acceptInvite, rejectInvite, changeName} = currentUserSlice.actions
+
+export default currentUserSlice.reducer;
