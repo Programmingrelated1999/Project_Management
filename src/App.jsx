@@ -5,7 +5,7 @@ import React from "react";
 import useToken from "./hooks/useToken";
 
 //Components
-import NavBar from './components/NavBar'
+import AppContainer from "./AppContainer";
 import LoginPage from './components/Login/LoginPage';
 
 //CSS
@@ -28,7 +28,7 @@ const App = () => {
   
   return (
     <div className="App">
-      <NavBar logout = {logout}/>
+      <AppContainer logout = {logout} />
     </div>
   )
 }

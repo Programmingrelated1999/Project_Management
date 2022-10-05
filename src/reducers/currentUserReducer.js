@@ -19,6 +19,6 @@ const currentUserSlice = createSlice({
   },
 })
 
-export const {setCurrentUser, acceptInvite, rejectInvite, changeName} = currentUserSlice.actions
+export const {setCurrentUser, logout} = currentUserSlice.actions
 
 export default currentUserSlice.reducer;

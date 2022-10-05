@@ -20,3 +20,9 @@
 #search-bar{
     width: 33%;
 }
+
+.project-table{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

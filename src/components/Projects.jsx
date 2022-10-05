@@ -7,7 +7,12 @@ import "./Projects.css"
 import { Button } from 'react-bootstrap';
 import ProjectList from './Projects/ProjectList';
 
+//redux
+import { useSelector } from 'react-redux';
+
 const Projects = () => {
+   const currentUserProjects = useSelector(state => state.currentUser.projects)
+
    const [searchFilter, setSearchFilter] = useState('');
    const [creator, setCreator] = useState(false);
    const [admin, setAdmin] = useState(false);
@@ -64,7 +69,9 @@ const Projects = () => {
         <Button variant="success" onClick = {changeClient}>Client {client === true? <span class="text-danger">X</span>: null}</Button> 
       </div>
 
-      <ProjectList />
+      <div className = "project-table">
+        {currentUserProjects.map((project) => <ProjectList key = {project.id} projectId = {project.id} name ={project.name} description = {project.description}/>)}
+      </div>
     </div>
   )
 }

@@ -21,6 +21,7 @@ const Home =  () => {
   const currentUserProjectInvites = useSelector(state => state.currentUser.projectInvites)
   const currentUserTasks = useSelector(state => state.currentUser.tasks)
   const userId = useSelector(state => state.currentUser.id)
+  const name = useSelector(state => state.currentUser.name)
 
   console.log("User Id", userId);
 
@@ -37,13 +38,18 @@ const Home =  () => {
     currentUserService.acceptInvite(userId, projectId).then((currentUser) => dispatch(setCurrentUser(currentUser)));
   }
 
+  const handleRejectInvite = (projectId) => {
+    console.log("handleRejectInvite", projectId);
+    currentUserService.rejectInvite(userId, projectId).then((currentUser) => dispatch(setCurrentUser(currentUser)));
+  }
+
   return (
     <div>
         <div className = "home-main">   
-            <Button variant="info">Create Project</Button>{' '}    
-            <Button variant="info" >Invite Friends</Button>{' '}  
+          WELCOME BACK! {name}
         </div>
         <SampleProjects />
+        <p>Invitations: </p>
         {currentUserProjectInvites.length === 0 ? 
           <p>No Invitations</p>: 
           <Table striped bordered hover size="sm">
@@ -54,7 +60,9 @@ const Home =  () => {
             </tr>
           </thead>
           <tbody>
-            {currentUserProjectInvites.map((project) => <Invitations key = {project.id} projectId = {project.id} name = {project.name} handleAcceptInvite = {handleAcceptInvite}/>)}
+            {currentUserProjectInvites.map((project) => 
+              <Invitations key = {project.id} projectId = {project.id} name = {project.name} handleAcceptInvite = {handleAcceptInvite} handleRejectInvite = {handleRejectInvite}/>)
+            }
           </tbody>
           </Table>
         }  

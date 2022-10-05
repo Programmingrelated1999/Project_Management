@@ -31,11 +31,10 @@ const NavBar = ({logout}) => {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.currentUser)
 
-
   useEffect(() => {
     const id = JSON.parse(localStorage.getItem('id'));
     currentUserService.getUser(id).then((currentUser) => dispatch(setCurrentUser(currentUser)));
-  }, [])
+  }, [currentUser])
 
   if(!currentUser){
     console.log("loading");

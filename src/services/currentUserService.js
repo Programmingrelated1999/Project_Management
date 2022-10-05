@@ -16,9 +16,9 @@ const acceptInvite = async (userId, projectId) => {
   return response.data;
 }
 
-const rejectInvite = async (userId, project) => {
+const rejectInvite = async (userId, projectId) => {
   const response = await axios.put(`${baseUrl}/${userId}`, {rejectInvite: projectId});
   return response.data;
 }
 
-export default {getUser, acceptInvite};
+export default {getUser, acceptInvite, rejectInvite};
