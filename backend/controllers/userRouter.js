@@ -100,11 +100,12 @@ userRouter.put("/:id", async (request, response) => {
       response.status(401).json({error: "Project cannot be found"});
     }
   }
+
   if(request.body.rejectInvite){
     try{
       const rejectInviteProject = await Projects.findById(request.body.rejectInvite);
       rejectInviteProject.invites = rejectInviteProject.invites.filter((userElement) => String(userElement) !== String(user._id));
-      user.projectInvites = user.projectInvites.filter((projectElement) => String(projectElement) !== String(acceptInviteProject._id));
+      user.projectInvites = user.projectInvites.filter((projectElement) => String(projectElement) !== String(rejectInviteProject._id));
       await rejectInviteProject.save();
       } catch(exception) {
       response.status(401).json({error: "Project cannot be found"});
