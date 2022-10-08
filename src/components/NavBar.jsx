@@ -15,26 +15,13 @@ import {
   Routes, Route, Link
 } from "react-router-dom"
 
-//REDUX
-import { setCurrentUser } from '../reducers/currentUserReducer';
-import currentUserService from '../services/currentUserService';
-import { useSelector, useDispatch } from 'react-redux';
-
 //COMPONENTS
 //import Components
 import Projects from './Projects';
 import Tasks from './Tasks';
 import Home from "./Home";
 
-const NavBar = ({logout}) => {
-  
-  const dispatch = useDispatch();
-  const currentUser = useSelector(state => state.currentUser)
-
-  useEffect(() => {
-    const id = JSON.parse(localStorage.getItem('id'));
-    currentUserService.getUser(id).then((currentUser) => dispatch(setCurrentUser(currentUser)));
-  }, [currentUser])
+const NavBar = ({logout, currentUser}) => {
 
   if(!currentUser){
     console.log("loading");

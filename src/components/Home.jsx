@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
 
-import Button from 'react-bootstrap/Button';
 import Calendar from './commonlyUsedComponents/Calendar';
 import Invitations from './Home/Invitations';
 import MiniTask from './Home/MiniTask';
@@ -12,16 +11,15 @@ import "./Home.css";
 import { useSelector, useDispatch } from "react-redux";
 
 import currentUserService from '../services/currentUserService';
-import { setCurrentUser } from '../reducers/currentUserReducer';
 
 //bootstrap
 import Table from 'react-bootstrap/Table';
 
 const Home =  () => {
-  const currentUserProjectInvites = useSelector(state => state.currentUser.projectInvites)
-  const currentUserTasks = useSelector(state => state.currentUser.tasks)
-  const userId = useSelector(state => state.currentUser.id)
-  const name = useSelector(state => state.currentUser.name)
+  const currentUserProjectInvites = useSelector(state => state.currentUser.personData.projectInvites)
+  const currentUserTasks = useSelector(state => state.currentUser.personData.tasks)
+  const userId = useSelector(state => state.currentUser.personData.id)
+  const name = useSelector(state => state.currentUser.personData.name)
 
   console.log("User Id", userId);
 

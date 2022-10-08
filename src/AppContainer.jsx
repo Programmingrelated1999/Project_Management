@@ -1,14 +1,33 @@
+import { getListSubheaderUtilityClass } from '@mui/material'
+import { current } from '@reduxjs/toolkit'
 import React, {useEffect} from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
-//REDUX
-import { setCurrentUser } from '../reducers/currentUserReducer';
-import currentUserService from '../services/currentUserService';
-import { useSelector, useDispatch } from 'react-redux';
+import NavBar from './components/NavBar'
+
+import { loadCurrentUserData } from './reducers/currentUserReducer'
 
 const AppContainer = ({logout}) => {
+  const id = JSON.parse(localStorage.getItem('id'));
+  const isLoading = useSelector(state => state.currentUser.isLoading);
+  const currentUser = useSelector(state => state.currentUser.personData);
+  const hasError = useSelector(state => state.currentUser.hasError);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(loadCurrentUserData(id))
+  }, [dispatch])
+
+  if(isLoading) return <p>Loading...</p>
+
+  if(hasError){
+    return <p>Error...</p>
+  }
+
   return (
     <div>
-        <NavBar logout = {logout}/>
+        <NavBar logout = {logout} currentUser = {currentUser}/>
     </div>
   )
 }
