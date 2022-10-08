@@ -1,15 +1,25 @@
 import React from 'react'
 import "./Tasks.css"
-import Card from './Tasks/Card'
+import { ListGroup, Badge } from 'react-bootstrap'
+import TaskListItem from './Tasks/TaskListItem'
+
+import { useSelector } from 'react-redux'
+import { current } from '@reduxjs/toolkit'
 
 const Tasks = () => {
+  const currentUserTasks = useSelector(state => state.currentUser.personData.tasks);
+
   return (
     <div className='tasks'>
         <div className = "calander">
           <p>Calander</p>
         </div>
         <div className = "tasksLog">
-            <Card />
+          <h1>Tasks List</h1>
+          <ListGroup as="ol" numbered>
+            {currentUserTasks.map(task => <TaskListItem key = {task.id} task = {task}/>)}
+            {console.log(currentUserTasks)}
+          </ListGroup>
         </div>
     </div>
   )
