@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 
-import Calendar from './commonlyUsedComponents/Calendar';
+import CalendarUI from './commonlyUsedComponents/CalendarUI';
 import Invitations from './Home/Invitations';
 import MiniTask from './Home/MiniTask';
 import SampleProjects from './Home/SampleProjects';
@@ -65,7 +65,7 @@ const Home =  () => {
           </Table>
         }  
         <div className = "calendarAndTask">
-          <Calendar />
+          <CalendarUI />
           <MiniTask tasks = {currentUserTasks}/>
         </div>
     </div>
