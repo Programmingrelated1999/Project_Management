@@ -4,7 +4,6 @@ import { ListGroup, Badge } from 'react-bootstrap'
 import TaskListItem from './Tasks/TaskListItem'
 
 import { useSelector } from 'react-redux'
-import { current } from '@reduxjs/toolkit'
 
 const Tasks = () => {
   const currentUserTasks = useSelector(state => state.currentUser.personData.tasks);
@@ -16,7 +15,7 @@ const Tasks = () => {
         </div>
         <div className = "tasksLog">
           <h1>Tasks List</h1>
-          <ListGroup as="ol" numbered>
+          <ListGroup as="ul">
             {currentUserTasks.map(task => <TaskListItem key = {task.id} task = {task}/>)}
             {console.log(currentUserTasks)}
           </ListGroup>

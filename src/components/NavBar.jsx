@@ -20,6 +20,7 @@ import {
 import Projects from './Projects';
 import Tasks from './Tasks';
 import Home from "./Home";
+import ProjectHome from './Projects/ProjectHome';
 
 const NavBar = ({logout, currentUser}) => {
 
@@ -52,11 +53,11 @@ const NavBar = ({logout, currentUser}) => {
         </div>
           <Routes>
             <Route path="/" element={<Home/>} />
-            <Route path="/projects" element={<Projects/>} />
+            <Route path="/projects/*" element={<Projects/>} />
             <Route path="/tasks" element={<Tasks />} />
+            <Route path="/projects/:id" element={<ProjectHome />} />
           </Routes>
     </>
-    
   )
 }
 

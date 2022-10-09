@@ -55,24 +55,26 @@ const Projects = () => {
    }
 
     return (
-    <div className='projects'>
-      <div className = "main-filter">
-        <h1>All Projects</h1>
-        <input id = "search-bar" placeholder='Search Your Projects' value = {searchFilter} onChange = {changeFilter}/>
-      </div>
+      <>
+        <div className='projects'>
+          <div className = "main-filter">
+            <h1>All Projects</h1>
+            <input id = "search-bar" placeholder='Search Your Projects' value = {searchFilter} onChange = {changeFilter}/>
+          </div>
 
-      <div className = "other-filters">
-        <span>Filter by Role</span>
-        <Button variant="success" onClick = {changeCreator}>Creator {creator === true? <span class="text-danger">X</span>: null}</Button>
-        <Button variant="success" onClick = {changeAdmin}>Admin {admin === true? <span class="text-danger">X</span>: null}</Button>
-        <Button variant="success" onClick = {changeDeveloper}>Developer {developer === true? <span class="text-danger">X</span>: null}</Button>
-        <Button variant="success" onClick = {changeClient}>Client {client === true? <span class="text-danger">X</span>: null}</Button> 
-      </div>
+          <div className = "other-filters">
+            <span>Filter by Role</span>
+            <Button variant="success" onClick = {changeCreator}>Creator {creator === true? <span class="text-danger">X</span>: null}</Button>
+            <Button variant="success" onClick = {changeAdmin}>Admin {admin === true? <span class="text-danger">X</span>: null}</Button>
+            <Button variant="success" onClick = {changeDeveloper}>Developer {developer === true? <span class="text-danger">X</span>: null}</Button>
+            <Button variant="success" onClick = {changeClient}>Client {client === true? <span class="text-danger">X</span>: null}</Button> 
+          </div>
 
-      <div className = "project-table">
-        {currentUserProjects.map((project) => <ProjectList key = {project.id} projectId = {project.id} name ={project.name} description = {project.description}/>)}
-      </div>
-    </div>
+          <div className = "project-table">
+            {currentUserProjects.map((project) => <ProjectList key = {project.id} projectId = {project.id} name ={project.name} description = {project.description}/>)}
+          </div>
+        </div>
+    </>
   )
 }
 
