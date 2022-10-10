@@ -10,11 +10,13 @@ import { Provider} from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 //import reducers
 import currentUserReducer from "./reducers/currentUserReducer";
+import currentProjectReducer from './reducers/currentProjectReducer';
 
 //create store
 const store = configureStore({
   reducer: {
-    currentUser: currentUserReducer
+    currentUser: currentUserReducer,
+    currentProject: currentProjectReducer
   }
 })
 

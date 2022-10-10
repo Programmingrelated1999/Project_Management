@@ -11,7 +11,7 @@ import ProjectList from './Projects/ProjectList';
 import { useSelector } from 'react-redux';
 
 const Projects = () => {
-   const currentUserProjects = useSelector(state => state.currentUser.personData.projects)
+   const currentUserProjects = useSelector(state => state.currentUser.personData.projects);
 
    const [searchFilter, setSearchFilter] = useState('');
    const [creator, setCreator] = useState(false);

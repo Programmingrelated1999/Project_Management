@@ -29,10 +29,13 @@ projectRouter.get("/", (request, response) => {
 });
 
 //GET ONE
-projectRouter.get("/:id", (request, response) => {
-  Projects.findById(request.params.id).then((project) => {
-      response.json(project);
-  });
+projectRouter.get("/:id", async (request, response) => {
+
+  const projectToReturn = await Projects.findById(request.params.id).populate('creator', {name: 1, username: 1})
+  .populate('admins', {name: 1, username: 1}).populate('developers', {name: 1, username: 1}).populate('clients', {name: 1, username: 1})
+  .populate('invites', {name: 1, username: 1});
+
+  response.json(projectToReturn);
 });
 
 //POST
