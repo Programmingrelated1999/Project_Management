@@ -6,8 +6,6 @@ import { useSelector } from 'react-redux';
 const ProjectDashboard = () => {
   const [progress, setProgress] = useState(0);
 
-  const creator = useSelector(state => state.currentProject.projectData.creator);
-
   return (
     <div>
       <h1>Project Overview</h1>

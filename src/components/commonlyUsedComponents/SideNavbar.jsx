@@ -2,10 +2,11 @@ import React, {useState} from 'react';
 import Nav from 'react-bootstrap/Nav';
 import ProjectDashboard from "../Projects/tabs/ProjectDashboard"
 import ProjectMembers from '../Projects/tabs/ProjectMembers';
+import ProjectTasks from '../Projects/tabs/projectTasks';
 
 const SideNavbar = () => {
 
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
 
   console.log(activeTab)
 
@@ -34,6 +35,7 @@ const SideNavbar = () => {
 
     {activeTab === 0? <ProjectDashboard />: null}
     {activeTab === 1? <ProjectMembers />: null}
+    {activeTab === 3? <ProjectTasks />: null}
   </>
   );
 }

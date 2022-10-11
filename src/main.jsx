@@ -11,12 +11,16 @@ import { configureStore } from "@reduxjs/toolkit";
 //import reducers
 import currentUserReducer from "./reducers/currentUserReducer";
 import currentProjectReducer from './reducers/currentProjectReducer';
+import currentTaskReducer from "./reducers/currentTaskReducer";
+import currentBugReducer from "./reducers/currentBugReducer";
 
 //create store
 const store = configureStore({
   reducer: {
     currentUser: currentUserReducer,
-    currentProject: currentProjectReducer
+    currentProject: currentProjectReducer,
+    currentTask: currentTaskReducer,
+    currentBug: currentBugReducer
   }
 })
 

@@ -6,7 +6,6 @@ import { loadCurrentProjectData } from '../../reducers/currentProjectReducer';
 import SideNavbar from '../commonlyUsedComponents/SideNavbar';
 
 import "./projectHome.css";
-import ProjectMembers from './tabs/ProjectMembers';
 
 const ProjectHome = () => {
     const { id } = useParams();

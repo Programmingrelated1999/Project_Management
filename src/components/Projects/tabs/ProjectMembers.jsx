@@ -3,9 +3,6 @@ import { useSelector } from 'react-redux'
 import "./projectMembers.css"
 
 const ProjectMembers = () => {
-
-  const project = useSelector(state => state.currentProject.projectData);
-  console.log(project);
   const creator = useSelector(state => state.currentProject.projectData.creator);
   const admins = useSelector(state => state.currentProject.projectData.admins);
   const developers = useSelector(state => state.currentProject.projectData.developers);
