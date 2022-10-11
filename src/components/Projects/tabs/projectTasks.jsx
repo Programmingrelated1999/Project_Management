@@ -1,14 +1,33 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { useSelector } from 'react-redux';
 
-const ProjectTasks = () => {
-  const currentProject = useSelector(state => state.currentProject.projectData);
+import ProjectTaskCard from '../Tasks/ProjectTaskCard';
 
-  console.log(currentProject.tasks);
+const ProjectTasks = () => {
+  const tasks = useSelector(state => state.currentProject.projectData.tasks);
+  
+  const isLoading = useSelector(state => state.currentProject.isLoading);
+
+  if(isLoading){
+    return <p>Is Loading</p>
+  }
+
+  const started = tasks.filter((task) => task.status === 'Created');
+  const progress = tasks.filter((task) => task.status === 'Progress');
+  const done = tasks.filter((task) => task.status === 'Done');
+
+  const handleDeleteCard = (id) => {
+    console.log("Delete", id);
+  }
 
   return (
     <div className='project-tasks'>
-      {currentProject.tasks.map((task) => <p>{task.name}</p>)}
+      <p>Started</p>
+        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} id = {task.id} handleDeleteCard = {handleDeleteCard}/>)}
+      <p>Progress</p>
+        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} id = {task.id} handleDeleteCard = {handleDeleteCard}/>)}  
+      <p>Done</p>
+        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} id = {task.id} handleDeleteCard = {handleDeleteCard}/>)}
     </div>
   )
 }

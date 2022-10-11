@@ -1,46 +1,38 @@
-import React from 'react';
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import React from 'react'
 
-const ReviewsBar = (score) => {
-  // function for calculating the color
-  const calcColor = (percent, start, end) => {
-    let a = percent / 100,
-      b = (end - start) * a,
-      c = b + start;
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { easeQuadInOut } from 'd3-ease';
 
-    // return an CSS hsl color string
-    return 'hsl(' + c + ', 100%, 50%)';
-  };
-
+const ProgressBar = ({percentage}) => {
   return (
-    <ReviewsProvider valueStart={0} valueEnd={score}>
-      {(value) => (
-        <CircularProgressbar
-          value={value}
-          text={`${value} %`}
-          circleRatio={0.7} /* Make the circle only 0.7 of the full diameter */
-          styles={{
-            trail: {
-              strokeLinecap: 'butt',
-              transform: 'rotate(-126deg)',
-              transformOrigin: 'center center',
-            },
-            path: {
-              strokeLinecap: 'butt',
-              transform: 'rotate(-126deg)',
-              transformOrigin: 'center center',
-              stroke: calcColor(value, 0, 120),
-            },
-            text: {
-              fill: '#ddd',
-            },
-          }}
-          strokeWidth={10}
-        />
-      )}
-    </ReviewsProvider>
-  );
-};
+    <CircularProgressbar
+      className='progress-bar-main'
+      value={percentage}
+      text={`${percentage}%`}
+      styles={buildStyles({
+        // Rotation of path and trail, in number of turns (0-1)
+        rotation: 0.25,
+    
+        // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
+        strokeLinecap: 'butt',
+    
+        // Text size
+        textSize: '1rem',
+    
+        // How long animation takes to go from one percentage to another, in seconds
+        pathTransitionDuration: 0.5,
+    
+        // Can specify path transition in more detail, or remove it entirely
+        // pathTransition: 'none',
+    
+        // Colors
+        pathColor: `rgba(62, 152, 199, ${percentage / 100})`,
+        textColor: '#f88',
+        trailColor: '#d6d6d6',
+        backgroundColor: '#3e98c7',
+      })}
+    />
+  )
+}
 
-export default ReviewsBar;
+export default ProgressBar;

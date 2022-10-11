@@ -30,9 +30,10 @@ const bugSchema = new mongoose.Schema({
         required: true,
     },
     status:{
-      type: Boolean,
+      type: String,
+      enum: ['Created', 'Progress', 'Done'],
       require: true,
-      default: false,
+      default: 'Created',
     }
 });
 

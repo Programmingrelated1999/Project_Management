@@ -3,6 +3,7 @@ import Nav from 'react-bootstrap/Nav';
 import ProjectDashboard from "../Projects/tabs/ProjectDashboard"
 import ProjectMembers from '../Projects/tabs/ProjectMembers';
 import ProjectTasks from '../Projects/tabs/projectTasks';
+import ProjectBugs from "../Projects/tabs/ProjectBugs";
 
 const SideNavbar = () => {
 
@@ -36,6 +37,7 @@ const SideNavbar = () => {
     {activeTab === 0? <ProjectDashboard />: null}
     {activeTab === 1? <ProjectMembers />: null}
     {activeTab === 3? <ProjectTasks />: null}
+    {activeTab === 4? <ProjectBugs />: null}
   </>
   );
 }

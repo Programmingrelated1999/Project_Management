@@ -16,8 +16,6 @@ const ProjectHome = () => {
     const isLoading = useSelector(state => state.currentProject.projectData.isLoading);
     const hasError= useSelector(state => state.currentProject.projectData.hasError);
 
-    const [status, setStatus] = useState(currentProject.status);
-
     //useEffect
     useEffect(() => {dispatch(loadCurrentProjectData(id))}, [id]);
 
