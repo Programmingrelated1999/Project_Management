@@ -1,19 +1,22 @@
 import React from 'react'
 import { Card } from 'react-bootstrap'
+import { Button, Chip } from '@mui/material'
 
-const ProjectTaskCard = ({name, description, createdDate, id, handleDeleteCard}) => {
+import "./ProjectTaskCard.css"
+
+const ProjectTaskCard = ({name, description, createdDate, taskId, openDelete}) => {
   return (
     <div>
-        <Card style={{ width: '18rem' }}>
+        <Card style={{ width: '18.5rem' }}>
             <Card.Body>
                 <Card.Title>{name}</Card.Title>
-                <Card.Subtitle>{createdDate}</Card.Subtitle>
+                <Chip label = {`Created on ${createdDate}`} color="primary" size="small" />
                 <Card.Text>
                     {description}
                 </Card.Text>
-                <Card.Link href="#">View Details</Card.Link>
-                <Card.Link href="#">Edit</Card.Link>
-                <Card.Link href="#" color = "red" onClick = {handleDeleteCard(id)}>Delete</Card.Link>
+                <Button href="#" className = "project-task-card">View Details</Button>
+                <Button href="#" className = "project-task-card">Edit</Button>
+                <Button href="#" color = "error" className = "project-task-card" onClick = {openDelete}>Delete</Button>
             </Card.Body>
         </Card>
     </div>

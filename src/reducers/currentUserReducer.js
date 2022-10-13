@@ -19,15 +19,8 @@ const currentUserSlice = createSlice({
     hasError: false
   },
   reducers: {
-    setCurrentUser: (state, action) => {
-      state.personData.name = action.payload.name;
-      state.personData.username = action.payload.username;
-      state.personData.bio = action.payload.bio;
-      state.personData.id = action.payload.id;
-      state.personData.projects = action.payload.projects;
-      state.personData.projectInvites = action.payload.projectInvites;
-      state.personData.tasks = action.payload.tasks;
-      state.personData.bugs = action.payload.bugs;
+    deleteTask: (state, action) => {
+      state.personData.tasks = state.personData.tasks.filter((task) => task.id !== action.payload.task);
     }
   },
   extraReducers: {

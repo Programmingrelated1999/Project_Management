@@ -10,6 +10,13 @@ export const loadCurrentTaskData = createAsyncThunk(
   }
 )
 
+export const deleteSelectedTask = async(id) => {
+    const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+    console.log(`http://localhost:3001/api/tasks/${id}`);
+    const response = await axios.delete(`http://localhost:3001/api/tasks/${id}`, {headers: {Authorization: token}});
+    return response.data;
+}
+
 //currentUserSlice
 const currentTaskSlice = createSlice({
   name: 'currentTask',
@@ -19,15 +26,6 @@ const currentTaskSlice = createSlice({
     hasError: false
   },
   reducers: {
-    setCurrentTask: (state, action) => {
-      state.taskData.name = action.payload.name;
-      state.taskData.description = action.payload.description;
-      state.taskData.project = action.payload.project;
-      state.taskData.createdDate = action.payload.createdDate;
-      state.taskData.endDate = action.payload.endDate;
-      state.taskData.assigned = action.payload.assigned;
-      state.taskData.status = action.payload.status;
-    }
   },
   extraReducers: {
     [loadCurrentTaskData.pending]: (state) => {

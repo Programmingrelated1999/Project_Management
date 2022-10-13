@@ -150,6 +150,7 @@ taskRouter.put("/:id", async(request, response) => {
 //filter the tasks from project to remove the current task from the list, then saved the project. 
 //remove the task and then return the removedTask information.
 taskRouter.delete("/:id", async (request, response) => {
+    console.log(request.params.id);
     const taskToDelete = await Tasks.findById(request.params.id);
     
     //get token from request called to check if the header contains bearer. Then take off bearer and return token.

@@ -56,6 +56,7 @@ const NavBar = ({logout, currentUser}) => {
             <Route path="/projects/*" element={<Projects/>} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/projects/:id" element={<ProjectHome />} />
+            <Route path="/projects/createNew" element = {<CreateNewProject />} />
           </Routes>
     </>
   )

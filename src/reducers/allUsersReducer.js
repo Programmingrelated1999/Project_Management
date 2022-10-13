@@ -2,19 +2,19 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
 // Create loadCurrentUserData here.
-export const loadCurrentProjectData = createAsyncThunk(
-  'currentProject/loadCurrentProjectData',
+export const loadAllUsersData = createAsyncThunk(
+  'currentBug/loadCurrentBugData',
   async(id, thunkAPI) => {
-    const response = await axios.get(`http://localhost:3001/api/projects/${id}`);
+    const response = await axios.get(`http://localhost:3001/api/users`);
     return response.data;
   }
 )
 
 //currentUserSlice
-const currentProjectSlice = createSlice({
-  name: 'currentProject',
+const allUsersSlice = createSlice({
+  name: 'allUsers',
   initialState: {
-    projectData: {},
+    allUsersData: {},
     isLoading: true,
     hasError: false
   },
@@ -24,20 +24,20 @@ const currentProjectSlice = createSlice({
     }
   },
   extraReducers: {
-    [loadCurrentProjectData.pending]: (state) => {
+    [loadallUsersData.pending]: (state) => {
       state.isLoading = true;
       state.hasError = false;
     },
-    [loadCurrentProjectData.fulfilled]: (state, { payload }) => {
+    [loadallUsersData.fulfilled]: (state, { payload }) => {
       state.isLoading = false;
       state.hasError = false;
-      state.projectData = payload;
+      state.allUsersData = payload;
     },
-    [loadCurrentProjectData.rejected]: (state) => {
+    [loadallUsersData.rejected]: (state) => {
       state.isLoading = false;
       state.hasError = true;
     },
   },
 })
 
-export default currentProjectSlice.reducer;
+export default allUsersSlice.reducer;
