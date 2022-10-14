@@ -1,0 +1,8 @@
+.user-found{
+    display: grid;
+    grid-template-columns: 6fr 1fr;
+}
+
+.user-found-div{
+    text-align: start
+}

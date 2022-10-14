@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create loadCurrentUserData here.
 export const loadAllUsersData = createAsyncThunk(
-  'currentBug/loadCurrentBugData',
+  'currentBug/loadAllUsersData',
   async(id, thunkAPI) => {
     const response = await axios.get(`http://localhost:3001/api/users`);
     return response.data;
@@ -24,16 +24,16 @@ const allUsersSlice = createSlice({
     }
   },
   extraReducers: {
-    [loadallUsersData.pending]: (state) => {
+    [loadAllUsersData.pending]: (state) => {
       state.isLoading = true;
       state.hasError = false;
     },
-    [loadallUsersData.fulfilled]: (state, { payload }) => {
+    [loadAllUsersData.fulfilled]: (state, { payload }) => {
       state.isLoading = false;
       state.hasError = false;
       state.allUsersData = payload;
     },
-    [loadallUsersData.rejected]: (state) => {
+    [loadAllUsersData.rejected]: (state) => {
       state.isLoading = false;
       state.hasError = true;
     },

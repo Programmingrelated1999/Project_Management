@@ -13,6 +13,7 @@ import currentUserReducer from "./reducers/currentUserReducer";
 import currentProjectReducer from './reducers/currentProjectReducer';
 import currentTaskReducer from "./reducers/currentTaskReducer";
 import currentBugReducer from "./reducers/currentBugReducer";
+import allUsersReducer from './reducers/allUsersReducer';
 
 //create store
 const store = configureStore({
@@ -20,7 +21,8 @@ const store = configureStore({
     currentUser: currentUserReducer,
     currentProject: currentProjectReducer,
     currentTask: currentTaskReducer,
-    currentBug: currentBugReducer
+    currentBug: currentBugReducer,
+    allUsers: allUsersReducer,
   }
 })
 

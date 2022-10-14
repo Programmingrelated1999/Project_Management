@@ -1,5 +1,6 @@
 .projects{
     display: block;
+    margin: 2rem 0;
 }
 
 .main-filter{
@@ -15,6 +16,10 @@
 
 .other-filters Button{
     margin: 1rem;
+}
+
+#create-new-project{
+    text-align: center;
 }
 
 #search-bar{

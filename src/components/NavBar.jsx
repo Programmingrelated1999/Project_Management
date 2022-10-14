@@ -21,6 +21,7 @@ import Projects from './Projects';
 import Tasks from './Tasks';
 import Home from "./Home";
 import ProjectHome from './Projects/ProjectHome';
+import CreateNewProject from './Projects/CreateNewProject';
 
 const NavBar = ({logout, currentUser}) => {
 
