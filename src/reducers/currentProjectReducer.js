@@ -10,6 +10,13 @@ export const loadCurrentProjectData = createAsyncThunk(
   }
 )
 
+//create a new project
+export const createANewProject = async(projectData) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.post(`http://localhost:3001/api/projects`, projectData, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentProjectSlice = createSlice({
   name: 'currentProject',

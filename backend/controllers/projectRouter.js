@@ -44,7 +44,6 @@ projectRouter.get("/:id", async (request, response) => {
 //check if there are any invites, get the user from the invites and save it. 
 //save the project into MongoDB.
 projectRouter.post("/", async (request, response) => {
-
   const token = getTokenFrom(request);
   const decodedToken = jwt.verify(token, process.env.SECRET);
   //if decode not successful, token is not valid.

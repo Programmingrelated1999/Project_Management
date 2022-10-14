@@ -1,18 +1,28 @@
 import React, {useState, useEffect} from 'react'
 import "./CreateNewProject.css"
 
-import { Form, Button, Container } from 'react-bootstrap';
+import { Form, Button, Container} from 'react-bootstrap';
+import { Button as MaterialUIButton } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { loadAllUsersData } from '../../reducers/allUsersReducer';
+import { createANewProject } from '../../reducers/currentProjectReducer';
+
+import { Navigate } from 'react-router-dom';
 
 import SearchUsersModal from './Modals/SearchUsersModal';
 
 const CreateNewProject = () => {
+  //project
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [invites, setInvites] = useState([]);
-  const [users, setUsers] = useState({});
+  const [shouldNotify, setShouldNotify] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [successfullyCreated, setSuccessfullyCreated] = useState(false);
+
+  //UI component
   const [showAdd, setShowAdd] = useState(false);
 
   const isLoading = useSelector(state => state.allUsers.isLoading);
@@ -22,13 +32,11 @@ const CreateNewProject = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(loadAllUsersData()); 
-    setUsers(allUsers);
   }, []);
 
   if(isLoading){
     return <p>Loading</p>
   }
-
   if(hasError){
     return <p>Has Error</p>
   }
@@ -36,7 +44,6 @@ const CreateNewProject = () => {
   const handleNameChange = (event) => {
     setName(event.target.value)
   }
-
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value)
   }
@@ -44,19 +51,53 @@ const CreateNewProject = () => {
   const openAdd = () => {
     setShowAdd(true);
   }
-
   const closeAdd = () => {
     setShowAdd(false);
   }
 
-  const handleSubmit = (event) => {
+  const addInvite = (invitedPerson) => {
+    console.log("Invited Person", invitedPerson);
+    setInvites(invites.concat(invitedPerson));
+  }
+  const removeInvite = (inviteId) => {
+    const newInviteList = invites.filter((invite) => invite.id !== inviteId);
+    setInvites(newInviteList);
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setName('');
-    setDescription('');
+    const invitesList = invites.map((invite) => invite.id);
+    if(name === ''){
+        setShouldNotify(true);
+        setNotificationMessage("Name is empty");
+        setTimeout(() => {
+          setShouldNotify(false);
+          setNotificationMessage("");
+        }, 3000)
+    } else if (description.length < 3){
+        setShouldNotify(true);
+        setNotificationMessage("Description should be at least 3 letters");
+        setTimeout(() => {
+          setShouldNotify(false);
+          setNotificationMessage("");
+        }, 3000)
+    } else{
+        const projectData = {
+          name: name,
+          description: description,
+          invites: invitesList
+        }
+        await createANewProject(projectData);
+        setName('');
+        setDescription('');
+        setInvites([]);
+        setSuccessfullyCreated(true);
+    }
   }
 
   return (
     <Container className = "mx-auto">
+      {shouldNotify? <p className='text-danger'>{notificationMessage}</p>: null}
       <Form onSubmit = {handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Project Name</Form.Label>
@@ -75,9 +116,13 @@ const CreateNewProject = () => {
         </Form.Group>
 
         <p>Current Invite List:</p>
-        {invites.map(invite => <p>{invite.username}</p>)}
+        {invites.length === 0? <p>Noone is invited. Click on Add Users Button to invite.</p>:null}
+        {invites.map(invite => 
+        <MaterialUIButton variant="outlined" color="error" key = {invite.id} onClick = {() => removeInvite(invite.id)}>
+          {invite.username} <CancelIcon />
+        </MaterialUIButton>)}
 
-        <SearchUsersModal showAdd = {showAdd} closeAdd = {closeAdd}/>
+        <SearchUsersModal showAdd = {showAdd} closeAdd = {closeAdd} addInvite = {addInvite} invites = {invites}/>
 
         <div>
           <Button variant="success" className='buttons-vertical' onClick = {openAdd}>Add Users</Button>
@@ -85,6 +130,8 @@ const CreateNewProject = () => {
           <Button variant="success" type="submit" className='buttons-vertical'>Submit</Button>
         </div>
       </Form>
+
+      {successfullyCreated? <Navigate to="/projects" replace={true} />: null}
     </Container>
   )
 }

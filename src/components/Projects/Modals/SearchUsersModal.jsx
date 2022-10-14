@@ -5,11 +5,12 @@ import "./SearchUsersModal.css"
 import { Modal, Button, Card } from 'react-bootstrap'
 import { useSelector } from 'react-redux';
 
-const SearchUsersModal = ({showAdd, closeAdd}) => {
+const SearchUsersModal = ({showAdd, closeAdd, addInvite, invites}) => {
 
     const allUsers = useSelector(state => state.allUsers.allUsersData);
     const isLoading = useSelector(state => state.allUsers.isLoading);
     const hasError = useSelector(state => state.allUsers.hasError);
+
     const currentUser = useSelector(state => state.currentUser.personData);
     const isCurrentUserLoading = useSelector(state => state.currentUser.isLoading);
     const hasCurrentUserError = useSelector(state => state.currentUser.hasError);
@@ -32,14 +33,30 @@ const SearchUsersModal = ({showAdd, closeAdd}) => {
 
     const findUser = () => {
         const user = allUsers.find(user => user.username === filter);
-        if(user.name === currentUser.name){
-            setNotification('Cannot add Yourself')
-        } else if(user){
-            setNotification('Found User')
-            setUserFound(user);
-        } else{
+        if(user){
+            if(user?.name === currentUser.name){
+                setNotification('Cannot add Yourself')
+            } 
+            else{
+                if(invites.includes(user)){
+                    setNotification('User Already in invite list')
+                }else{
+                    setNotification('Found User')
+                    setUserFound(user);
+                }
+            }
+        }
+        else{
             setNotification('User not found!')
         }
+    }
+
+    const handleAddInvite = () =>{
+        setFilter("")
+        setNotification("")
+        addInvite(userFound);
+        setUserFound();
+        closeAdd();
     }
 
     return (
@@ -48,17 +65,17 @@ const SearchUsersModal = ({showAdd, closeAdd}) => {
                 <Modal.Title>Enter Username to Add</Modal.Title>
             </Modal.Header>
             <Modal.Body className = "text-danger">
-                <input placeholder='username forexample - username1' value = {filter} onChange = {handleFilter}/> <Button variant = "success" onClick = {findUser}>Search</Button>
+                <input placeholder='Type Username' value = {filter} onChange = {handleFilter}/> <Button variant = "success" onClick = {findUser}>Search</Button>
                 {userFound?     
-                <div>{userFound.name}</div>:<p>{notification}</p>}
+                    <>
+                        <div>{userFound.name}</div>
+                        {console.log(userFound.id)}
+                        <button onClick = {handleAddInvite}>Add</button>
+                    </>
+                    :<p>{notification}</p>
+                }
             </Modal.Body>
             <Modal.Footer>
-            <Button variant="danger" onClick = {closeAdd}>
-                Yes
-            </Button>
-            <Button variant="primary" onClick = {closeAdd}>
-                No
-            </Button>
             </Modal.Footer>
     </Modal>
     )
