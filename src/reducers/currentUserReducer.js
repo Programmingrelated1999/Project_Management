@@ -15,8 +15,16 @@ export const loadCurrentUserData = createAsyncThunk(
 export const acceptInvite = createAsyncThunk(
   'currentUser/acceptInvite',
   async({userId, projectId}, thunkAPI) => {
-    console.log("hi")
     const response = await axios.put(`http://localhost:3001/api/users/${userId}`, {acceptInvite: projectId});
+    return response.data;
+  }
+)
+
+//acceptInvite
+export const rejectInvite = createAsyncThunk(
+  'currentUser/rejectInvite',
+  async({userId, projectId}, thunkAPI) => {
+    const response = await axios.put(`http://localhost:3001/api/users/${userId}`, {rejectInvite: projectId});
     return response.data;
   }
 )
@@ -62,6 +70,21 @@ const currentUserSlice = createSlice({
       state.isLoading = false;
       state.hasError = true;
     },
+
+    [rejectInvite.pending]: (state) => {
+      state.isLoading = true;
+      state.hasError = false;
+    },
+    [rejectInvite.fulfilled]: (state, { payload }) => {
+      state.isLoading = false;
+      state.hasError = false;
+      state.personData = payload;
+    },
+    [rejectInvite.rejected]: (state) => {
+      state.isLoading = false;
+      state.hasError = true;
+    },
+
   },
 })
 export default currentUserSlice.reducer;

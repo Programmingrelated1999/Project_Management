@@ -3,8 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import ProjectTaskCard from '../Tasks/ProjectTaskCard';
 import DeleteModal from '../Tasks/Modals/DeleteModal';
+import ViewModal from '../Tasks/Modals/ViewModal';
+import EditModal from '../Tasks/Modals/EditModal';
 
 import { deleteSelectedTask } from '../../../reducers/currentTaskReducer';
+
 
 const ProjectTasks = () => {
   const tasks = useSelector(state => state.currentProject.projectData.tasks);
@@ -25,12 +28,12 @@ const ProjectTasks = () => {
   const [showViewDetails, setShowViewDetails] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [taskSelected, setTaskSelected] = useState(0);
+  const [taskSelected, setTaskSelected] = useState('');
   const [isDelete, setIsDelete] = useState(false);
 
   //modal handlers
-  const openViewDetails = (taskId) => {
-    setTaskSelected(taskId);
+  const openViewDetails = async (taskId) => {
+    await setTaskSelected(taskId);
     setShowViewDetails(true);
   }
   const openEdit = (taskId) => {
@@ -75,12 +78,13 @@ const ProjectTasks = () => {
   return (
     <div className='project-tasks'>
       <p>Started</p>
-        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)}/>)}
+        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)}/>)}
       <p>Progress</p>
-        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)}/>)}  
+        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)}/>)}  
       <p>Done</p>
-        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)}/>)}
-
+        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)}/>)}
+      
+      {taskSelected? <ViewModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} taskSelected={taskSelected}/>: null}
       <DeleteModal showDelete={showDelete} closeDelete = {closeDelete} loadDelete = {loadDelete} isDelete = {isDelete} handleDelete = {handleDelete}/>
     </div>
   )

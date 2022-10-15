@@ -4,7 +4,7 @@ import { Button, Chip } from '@mui/material'
 
 import "./ProjectTaskCard.css"
 
-const ProjectTaskCard = ({name, description, createdDate, taskId, openDelete}) => {
+const ProjectTaskCard = ({name, description, createdDate, openDelete, openViewDetails}) => {
   return (
     <div>
         <Card style={{ width: '18.5rem' }}>
@@ -14,8 +14,8 @@ const ProjectTaskCard = ({name, description, createdDate, taskId, openDelete}) =
                 <Card.Text>
                     {description}
                 </Card.Text>
-                <Button href="#" className = "project-task-card">View Details</Button>
-                <Button href="#" className = "project-task-card">Edit</Button>
+                <Button href="#" className = "project-task-card"  onClick = {openViewDetails}>View Details</Button>
+                <Button href="#" className = "project-task-card" >Edit</Button>
                 <Button href="#" color = "error" className = "project-task-card" onClick = {openDelete}>Delete</Button>
             </Card.Body>
         </Card>

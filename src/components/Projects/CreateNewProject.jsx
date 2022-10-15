@@ -59,7 +59,6 @@ const CreateNewProject = () => {
   }
 
   const addInvite = (invitedPerson) => {
-    console.log("Invited Person", invitedPerson);
     setInvites(invites.concat(invitedPerson));
   }
   const removeInvite = (inviteId) => {

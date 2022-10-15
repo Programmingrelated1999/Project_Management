@@ -26,10 +26,9 @@ taskRouter.get("/", (request, response) => {
 });
 
 //GET ONE
-taskRouter.get("/:id", (request, response) => {
-    Tasks.findById(request.params.id).then((task) => {
-        response.json(task);
-    });
+taskRouter.get("/:id", async (request, response) => {
+    const taskToReturn = await Tasks.findById(request.params.id).populate('assigned', {name: 1, username: 1});
+    response.json(taskToReturn)
 });
 
 //POST 

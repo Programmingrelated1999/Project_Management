@@ -9,7 +9,7 @@ import "./Home.css";
 //REDUX
 //useSelector from Redux
 import { useSelector, useDispatch } from "react-redux";
-import { acceptInvite, loadCurrentUserData } from '../reducers/currentUserReducer';
+import { acceptInvite, loadCurrentUserData, rejectInvite } from '../reducers/currentUserReducer';
 
 //bootstrap
 import Table from 'react-bootstrap/Table';
@@ -36,8 +36,10 @@ const Home =  () => {
     dispatch(loadCurrentUserData(userId));
   }
 
-  const handleRejectInvite = (projectId) => {
-    console.log("handleRejectInvite", projectId);
+  const handleRejectInvite = async (projectId) => {
+    console.log("handleAcceptInviteProjectId", projectId);
+    await dispatch(rejectInvite({userId: userId, projectId: projectId}))
+    dispatch(loadCurrentUserData(userId));
   }
 
   return (

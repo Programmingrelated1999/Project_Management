@@ -5,6 +5,7 @@ import axios from "axios";
 export const loadCurrentTaskData = createAsyncThunk(
   'currentTask/loadCurrentTaskData',
   async(id, thunkAPI) => {
+    console.log("id", id);
     const response = await axios.get(`http://localhost:3001/api/tasks/${id}`);
     return response.data;
   }
