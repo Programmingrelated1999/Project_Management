@@ -8,8 +8,9 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { loadAllUsersData } from '../../reducers/allUsersReducer';
 import { createANewProject } from '../../reducers/currentProjectReducer';
+import { loadCurrentUserData } from '../../reducers/currentUserReducer';
 
-import { Navigate } from 'react-router-dom';
+import { useNavigate, Navigate} from 'react-router-dom';
 
 import SearchUsersModal from './Modals/SearchUsersModal';
 
@@ -18,9 +19,9 @@ const CreateNewProject = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [invites, setInvites] = useState([]);
+
   const [shouldNotify, setShouldNotify] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('')
-  const [successfullyCreated, setSuccessfullyCreated] = useState(false);
 
   //UI component
   const [showAdd, setShowAdd] = useState(false);
@@ -28,6 +29,8 @@ const CreateNewProject = () => {
   const isLoading = useSelector(state => state.allUsers.isLoading);
   const hasError = useSelector(state => state.allUsers.hasError);
   const allUsers = useSelector(state => state.allUsers.allUsersData);
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -88,10 +91,12 @@ const CreateNewProject = () => {
           invites: invitesList
         }
         await createANewProject(projectData);
+        const userId = JSON.parse(localStorage.getItem('id'));
+        await dispatch(loadCurrentUserData(userId));
         setName('');
         setDescription('');
         setInvites([]);
-        setSuccessfullyCreated(true);
+        navigate("/projects")
     }
   }
 
@@ -130,8 +135,6 @@ const CreateNewProject = () => {
           <Button variant="success" type="submit" className='buttons-vertical'>Submit</Button>
         </div>
       </Form>
-
-      {successfullyCreated? <Navigate to="/projects" replace={true} />: null}
     </Container>
   )
 }

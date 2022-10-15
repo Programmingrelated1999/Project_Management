@@ -12,7 +12,6 @@ export const loadCurrentTaskData = createAsyncThunk(
 
 export const deleteSelectedTask = async(id) => {
     const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-    console.log(`http://localhost:3001/api/tasks/${id}`);
     const response = await axios.delete(`http://localhost:3001/api/tasks/${id}`, {headers: {Authorization: token}});
     return response.data;
 }

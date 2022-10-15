@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 
 import CalendarUI from './commonlyUsedComponents/CalendarUI';
 import Invitations from './Home/Invitations';
@@ -9,8 +9,7 @@ import "./Home.css";
 //REDUX
 //useSelector from Redux
 import { useSelector, useDispatch } from "react-redux";
-
-import currentUserService from '../services/currentUserService';
+import { acceptInvite, loadCurrentUserData } from '../reducers/currentUserReducer';
 
 //bootstrap
 import Table from 'react-bootstrap/Table';
@@ -31,14 +30,14 @@ const Home =  () => {
     )
   }
 
-  const handleAcceptInvite = (projectId) => {
+  const handleAcceptInvite = async (projectId) => {
     console.log("handleAcceptInviteProjectId", projectId);
-    currentUserService.acceptInvite(userId, projectId).then((currentUser) => dispatch(setCurrentUser(currentUser)));
+    await dispatch(acceptInvite({userId: userId, projectId: projectId}))
+    dispatch(loadCurrentUserData(userId));
   }
 
   const handleRejectInvite = (projectId) => {
     console.log("handleRejectInvite", projectId);
-    currentUserService.rejectInvite(userId, projectId).then((currentUser) => dispatch(setCurrentUser(currentUser)));
   }
 
   return (
