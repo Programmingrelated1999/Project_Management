@@ -3,11 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import ProjectTaskCard from '../Tasks/ProjectTaskCard';
 import DeleteModal from '../Tasks/Modals/DeleteModal';
-import ViewModal from '../Tasks/Modals/ViewModal';
-import EditModal from '../Tasks/Modals/EditModal';
+import ViewTaskModal from '../Tasks/Modals/ViewTaskModal';
 
 import { deleteSelectedTask } from '../../../reducers/currentTaskReducer';
-
 
 const ProjectTasks = () => {
   const tasks = useSelector(state => state.currentProject.projectData.tasks);
@@ -84,7 +82,7 @@ const ProjectTasks = () => {
       <p>Done</p>
         {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)}/>)}
       
-      {taskSelected? <ViewModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} taskSelected={taskSelected}/>: null}
+      {taskSelected? <ViewTaskModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} taskSelected={taskSelected}/>: null}
       <DeleteModal showDelete={showDelete} closeDelete = {closeDelete} loadDelete = {loadDelete} isDelete = {isDelete} handleDelete = {handleDelete}/>
     </div>
   )

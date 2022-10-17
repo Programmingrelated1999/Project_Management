@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { loadCurrentTaskData } from '../../../../reducers/currentTaskReducer'
 
-const ViewModal = ({showViewDetails, closeViewDetails, taskSelected}) => {
+const ViewTaskModal = ({showViewDetails, closeViewDetails, taskSelected}) => {
 
     const currentTask = useSelector(state => state.currentTask.taskData)
     const isLoading = useSelector(state => state.currentTask.isLoading);
@@ -18,11 +18,22 @@ const ViewModal = ({showViewDetails, closeViewDetails, taskSelected}) => {
     useEffect(() => {dispatch(loadCurrentTaskData(taskSelected))}, [taskSelected]);
 
     if(isLoading){
-        return <p>Loading...</p>
+        return(
+            <Modal show={showViewDetails} onHide={closeViewDetails} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Loading...</Modal.Title>
+                </Modal.Header>
+            </Modal>
+        )
     }
-
     if(hasError){
-        return <p>Has Error</p>
+        return(
+            <Modal show={showViewDetails} onHide={closeViewDetails} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Has Error</Modal.Title>
+                </Modal.Header>
+            </Modal>
+        )
     }
 
   return (
@@ -53,4 +64,4 @@ const ViewModal = ({showViewDetails, closeViewDetails, taskSelected}) => {
   )
 }
 
-export default ViewModal
+export default ViewTaskModal

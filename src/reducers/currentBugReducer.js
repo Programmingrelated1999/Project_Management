@@ -10,6 +10,12 @@ export const loadCurrentBugData = createAsyncThunk(
   }
 )
 
+export const deleteSelectedBug = async(id) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.delete(`http://localhost:3001/api/bugs/${id}`, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentBugSlice = createSlice({
   name: 'currentBug',

@@ -40,6 +40,9 @@ const currentUserSlice = createSlice({
   reducers: {
     deleteTask: (state, action) => {
       state.personData.tasks = state.personData.tasks.filter((task) => task.id !== action.payload.task);
+    },
+    deleteBug: (state, action) => {
+      state.personData.bugs = state.personData.bugs.filter((bug) => bug.id !== action.payload.bug);
     }
   },
   extraReducers: {

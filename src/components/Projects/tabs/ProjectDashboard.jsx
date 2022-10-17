@@ -1,4 +1,3 @@
-import { current } from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 
 import { useSelector } from 'react-redux';
@@ -20,6 +19,7 @@ const ProjectDashboard = () => {
     return <p>Is Loading...</p>
   }
 
+  //for displaying dashboard stats
   const taskCreated = currentProject.tasks.reduce( (count, task) => task.status === 'Created'? count + 1 : count, 0)
   const taskProgress = currentProject.tasks.reduce( (count, task) => task.status === 'Progress'? count + 1 : count, 0)
   const taskDone = currentProject.tasks.reduce( (count, task) => task.status === 'Done'? count + 1 : count, 0)
