@@ -55,18 +55,32 @@ taskRouter.post("/", async (request, response) => {
     //if user is owner or admin, allow create task.
     if(isUserCreator || isUserAdmin){
         //createe a task object
-        const task = new Tasks({
+        let task = new Tasks({
             name: request.body.name,
             createdDate: Date.now(),
             description: request.body.description,
             project: project._id,
         });
+
+        let assignedList;
+
+          //if there are any users invited from the project, then saved the list of users in the invite list.
+        if(request.body.assigned){
+            task.assigned = request.body.assigned;
+            assignedList = request.body.assigned;
+        }
     
         //save the task. concat the task to project tasks and save the project.
         const savedTask = await task.save();
         project.tasks = project.tasks.concat(savedTask._id);
         await project.save();
-    
+
+        //save the project to the invited user's project invites list.
+        for(let user of assignedList){
+            let assignedUser = await Users.findById(user);
+            assignedUser.tasks = assignedUser.tasks.concat(savedTask._id);
+            await assignedUser.save();
+        }
         //return saved task
         response.json(savedTask);
     } else{
@@ -149,7 +163,7 @@ taskRouter.put("/:id", async(request, response) => {
 //filter the tasks from project to remove the current task from the list, then saved the project. 
 //remove the task and then return the removedTask information.
 taskRouter.delete("/:id", async (request, response) => {
-    console.log(request.params.id);
+    console.log("Request Params Id", request.params.id);
     const taskToDelete = await Tasks.findById(request.params.id);
     
     //get token from request called to check if the header contains bearer. Then take off bearer and return token.
@@ -174,7 +188,7 @@ taskRouter.delete("/:id", async (request, response) => {
         )
         await project.save();
 
-        const userList = taskToDelete.assigned.map((user) => user.id);
+        const userList = taskToDelete.assigned.map((user) => user);
         for (let user of userList){
             const userToUpdate = await Users.findById(user);
             userToUpdate.tasks = userToUpdate.tasks.filter((task) => task != taskToDelete.id);

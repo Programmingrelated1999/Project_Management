@@ -174,7 +174,7 @@ bugRouter.delete("/:id", async (request, response) => {
         )
         await project.save();
 
-        const userList = bugToDelete.assigned.map((user) => user.id);
+        const userList = bugToDelete.assigned.map((user) => user);
         for (let user of userList){
             const userToUpdate = await Users.findById(user);
             userToUpdate.bugs = userToUpdate.bugs.filter((bug) => bug != bugToDelete.id);
