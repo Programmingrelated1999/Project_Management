@@ -119,12 +119,17 @@ const CreateNewProject = () => {
           </Form.Text>
         </Form.Group>
 
-        <p>Current Invite List:</p>
-        {invites.length === 0? <p>Noone is invited. Click on Add Users Button to invite.</p>:null}
+        {/*Current Invite list with a warning text if no users are invited*/ }
+        <p className = "inline-paragraphs">Current Invite List:</p>
+        {invites.length === 0? <p className = "text-warning inline-paragraphs">Noone is invited. Click on Add Users Button to invite.</p>:null}
+        
+        {/*Current Invite list display*/ }
+        <div className = "d-block">
         {invites.map(invite => 
         <MaterialUIButton variant="outlined" color="error" key = {invite.id} onClick = {() => removeInvite(invite.id)}>
           {invite.username} <CancelIcon />
         </MaterialUIButton>)}
+        </div>
 
         <SearchUsersModal showAdd = {showAdd} closeAdd = {closeAdd} addInvite = {addInvite} invites = {invites}/>
 

@@ -17,6 +17,12 @@ export const deleteSelectedTask = async(id) => {
     return response.data;
 }
 
+export const createTask = async(data) => {
+    const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+    const response = await axios.post(`http://localhost:3001/api/tasks`, data, {headers: {Authorization: token}});
+    return response.data;
+}
+
 //currentUserSlice
 const currentTaskSlice = createSlice({
   name: 'currentTask',
