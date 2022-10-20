@@ -168,6 +168,7 @@ taskRouter.delete("/:id", async (request, response) => {
     
     //get token from request called to check if the header contains bearer. Then take off bearer and return token.
     const token = getTokenFrom(request);
+    console.log("got here 1");
     //decode the token into the user object which will contain username and id.
     const decodedToken = jwt.verify(token, process.env.SECRET);
     //if decode not successful, token is not valid.
@@ -181,13 +182,17 @@ taskRouter.delete("/:id", async (request, response) => {
     //check user role: user must be admin or owner to create task.
     const isUserCreator = String(project.creator) === String(user._id)? true: false;
     const isUserAdmin = project.admins.includes(user._id)? true: false;
+    
+    console.log("got here 2");
 
     if(isUserCreator || isUserAdmin){
+        console.log("got here 3");
         project.tasks = await project.tasks.filter((taskElement) => 
             String(taskElement) !== String(taskToDelete._id)
         )
         await project.save();
 
+        console.log("got here 4");
         const userList = taskToDelete.assigned.map((user) => user);
         for (let user of userList){
             const userToUpdate = await Users.findById(user);

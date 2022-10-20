@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import ProjectTaskCard from '../Tasks/ProjectTaskCard';
 import DeleteModal from '../Tasks/Modals/DeleteModal';
 import ViewTaskModal from '../Tasks/Modals/ViewTaskModal';
+import EditTaskModal from '../Tasks/Modals/EditTaskModal';
 
 //other components
 import { Container, Button } from 'react-bootstrap';
@@ -15,9 +16,16 @@ import CreateANewTaskModal from '../Tasks/Modals/CreateANewTaskModal';
 
 const ProjectTasks = () => {
   const tasks = useSelector(state => state.currentProject.projectData.tasks);
-  const currentProject = useSelector(state => state.currentProject.projectData);
   const isLoading = useSelector(state => state.currentProject.isLoading);
   const hasError = useSelector(state => state.currentProject.hasError);
+
+  //view details, edit and delete modals variables
+  const [showViewDetails, setShowViewDetails] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showCreateTask, setShowCreateTask] = useState(false);
+  const [taskSelected, setTaskSelected] = useState('');
+  const [isDelete, setIsDelete] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -28,14 +36,6 @@ const ProjectTasks = () => {
   if(hasError){
     return <p>Has Error</p>
   }
-
-  //view details, edit and delete modals variables
-  const [showViewDetails, setShowViewDetails] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [taskSelected, setTaskSelected] = useState('');
-  const [isDelete, setIsDelete] = useState(false);
 
   //check if the user is admin or creator
   /*
@@ -60,7 +60,7 @@ const ProjectTasks = () => {
   }
   const openEdit = (taskId) => {
     setTaskSelected(taskId);
-    setShowViewEdit(true);
+    setShowEdit(true);
   }
   const openDelete = (taskId) => {
     setTaskSelected(taskId);
@@ -114,13 +114,14 @@ const ProjectTasks = () => {
         <Button className = "btn btn-warning" onClick = {openCreateTask}>Create New Task</Button>
       </Container>
       <p>Started</p>
-        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)}/>)}
+        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}
       <p>Progress</p>
-        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)}/>)}  
+        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)} />)}  
       <p>Done</p>
-        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)}/>)}
+        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}
       
       {taskSelected? <ViewTaskModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} taskSelected={taskSelected}/>: null}
+      {taskSelected? <EditTaskModal showEdit={showEdit} closeEdit = {closeEdit} taskSelected={taskSelected}/> : null}
       <DeleteModal showDelete={showDelete} closeDelete = {closeDelete} loadDelete = {loadDelete} isDelete = {isDelete} handleDelete = {handleDelete}/>
       <CreateANewTaskModal showCreateTask={showCreateTask} closeCreateTask={closeCreateTask} handleCreateTask = {handleCreateTask}/>
     </div>

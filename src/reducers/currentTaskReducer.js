@@ -23,6 +23,12 @@ export const createTask = async(data) => {
     return response.data;
 }
 
+export const editSelectedTask = async(id, data) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.put(`http://localhost:3001/api/tasks/${id}`, data, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentTaskSlice = createSlice({
   name: 'currentTask',
@@ -32,6 +38,12 @@ const currentTaskSlice = createSlice({
     hasError: false
   },
   reducers: {
+    addAssignee: (state, action) => {
+      state.taskData.assigned = state.taskData.assigned.concat(action.payload.addUser);
+    },
+    deleteAssignee: (state, action) => {
+      state.taskData.assigned = state.taskData.assigned.filter((user) => user.id !== action.payload.deleteUser);
+    }
   },
   extraReducers: {
     [loadCurrentTaskData.pending]: (state) => {
