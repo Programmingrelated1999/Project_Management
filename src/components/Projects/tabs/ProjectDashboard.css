@@ -12,10 +12,6 @@
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
-.card-body{
-    justify-content: center;
-}
-
 .progress-bar{
     margin: auto;
 }
@@ -28,12 +24,11 @@
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
-.card-body{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .no-item-reminder{
     text-align: center;
+}
+
+#total-members-text{
+    font-size: 1.6rem;
+    font-weight: bold;
 }

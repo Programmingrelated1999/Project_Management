@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useSelector } from 'react-redux';
-import Progress from 'react-circle-progress-bar';
+import {Progress} from 'react-circle-progress-bar';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
@@ -77,27 +77,36 @@ const ProjectDashboard = () => {
   return (
     <div>
       <h1>Project Overview</h1>
-      <Container className = "dashboard" >
-        <Card className = "project-dashboard-progress">
+      <Container className = "dashboard">
+        <Card className = "project-dashboard-progress bg-gradient-info">
           <Card.Title className = "my-1">Progress</Card.Title>
-          <Card.Body className = "card-body">
-            <Progress progress={projectProgress} subtitle = "Done" className = "progress-bar"/>
+          <Card.Body>
+            <Progress progress={projectProgress} subtitle = "Done" className = "progress-bar" background = "gray" />
           </Card.Body>
         </Card>
         <Card className = "project-dashboard-progress">
           <Card.Title className = "my-1">Project Team Overview</Card.Title>
           <Card.Body>
-            <ul>
-              <li key = "creator">
-                1 Creator
-              </li>
-              <li key = "admins">
-                {currentProject.admins.length} Admins
-              </li>
-              <li key = "developers">
-                {currentProject.developers.length} Developers
-              </li>
-            </ul>
+            <table class="table table-sm">
+              <tbody>
+                <tr>
+                  <td>Creator</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>Admins</td>
+                  <td>{currentProject.admins.length}</td>
+                </tr>
+                <tr>
+                  <td>Developers</td>
+                  <td>{currentProject.developers.length}</td>
+                </tr>
+                <tr id = "total-members-text">
+                  <td>Total Members</td>
+                  <td>{currentProject.admins.length + currentProject.developers.length + 1}</td>
+                </tr>
+              </tbody>
+            </table>
           </Card.Body>
         </Card>
       </Container>
