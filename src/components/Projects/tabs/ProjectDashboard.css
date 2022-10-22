@@ -1,4 +1,39 @@
-.progress-bar-main{
-    width: 12rem;
-    height: 12rem;
+.dashboard{
+    display: flex;
+    justify-content: space-around;
+    margin: 2rem;
+}
+
+.project-dashboard-progress{
+    width: 30rem;
+    height: 30rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.card-body{
+    justify-content: center;
+}
+
+.progress-bar{
+    margin: auto;
+}
+
+.pie-charts{
+    width: 22rem;
+    height: 25rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.card-body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-item-reminder{
+    text-align: center;
 }

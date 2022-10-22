@@ -1,9 +1,15 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import { useSelector } from 'react-redux';
-import ProgressBar from '../../commonlyUsedComponents/ProgressBar';
+import Progress from 'react-circle-progress-bar';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
 
-import "./ProjectDashboard.css"
+import { Card, Container } from 'react-bootstrap';
+
+import "./ProjectDashboard.css";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ProjectDashboard = () => {
 
@@ -32,19 +38,83 @@ const ProjectDashboard = () => {
     projectProgress = 0;
   }
 
+  const taskData = {
+    labels: [
+      "Haven't started (Created)",
+      'In Progress',
+      'Done'
+    ],
+    datasets: [{
+      label: 'Project Tasks',
+      data: [taskCreated,taskProgress,taskDone],
+      backgroundColor: [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 205, 86)'
+      ],
+      hoverOffset: 4
+    }]
+  };
+
+  const bugData = {
+    labels: [
+      "Haven't started (Created)",
+      'In Progress',
+      'Done'
+    ],
+    datasets: [{
+      label: 'Project Bugs',
+      data: [bugCreated, bugProgress, bugDone],
+      backgroundColor: [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 205, 86)'
+      ],
+      hoverOffset: 4
+    }]
+  };
+
   return (
     <div>
       <h1>Project Overview</h1>
-      <h3>Number of Members</h3>
-      <h3>Project Done</h3>
-      <ProgressBar percentage = {projectProgress}/>
-      <h2>Project Breakdown</h2>
-      <h4>Total Number of Tasks: </h4>
-      <h4>{currentProject.tasks.length}</h4>
-      <h4>Started: {taskCreated} In Progress: {taskProgress} Done: {taskDone}</h4>
-      <h4>Total Number of Bugs: </h4>
-      <h4>{currentProject.bugs.length}</h4>
-      <h4>Started: {bugCreated} In Progress: {bugProgress} Done: {bugDone}</h4>
+      <Container className = "dashboard" >
+        <Card className = "project-dashboard-progress">
+          <Card.Title className = "my-1">Progress</Card.Title>
+          <Card.Body className = "card-body">
+            <Progress progress={projectProgress} subtitle = "Done" className = "progress-bar"/>
+          </Card.Body>
+        </Card>
+        <Card className = "project-dashboard-progress">
+          <Card.Title className = "my-1">Project Team Overview</Card.Title>
+          <Card.Body>
+            <ul>
+              <li key = "creator">
+                1 Creator
+              </li>
+              <li key = "admins">
+                {currentProject.admins.length} Admins
+              </li>
+              <li key = "developers">
+                {currentProject.developers.length} Developers
+              </li>
+            </ul>
+          </Card.Body>
+        </Card>
+      </Container>
+      <Container className = "dashboard">
+        <Card className='pie-charts'>
+          <Card.Title>Task BreakDown</Card.Title>
+          <Card.Body className='card-body'>
+            <Pie data = {taskData} className = "pie"/>
+          </Card.Body>
+        </Card>
+        <Card className = "pie-charts">
+          <Card.Title>Bugs BreakDown</Card.Title>
+          <Card.Body className="card-body">
+            {currentProject.bugs.length === 0? <div className='no-item-reminder'><p>No Bugs for data to show</p></div>:<Pie data = {bugData} className = "pie"/>}
+          </Card.Body>
+        </Card>
+      </Container>
     </div>
   )
 }
