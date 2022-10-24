@@ -87,7 +87,7 @@ const ProjectDashboard = () => {
         <Card className = "project-dashboard-progress">
           <Card.Title className = "my-1">Project Team Overview</Card.Title>
           <Card.Body>
-            <table class="table table-sm">
+            <table className="table table-sm">
               <tbody>
                 <tr>
                   <td>Creator</td>
