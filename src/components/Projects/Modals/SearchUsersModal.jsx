@@ -11,19 +11,15 @@ const SearchUsersModal = ({showAdd, closeAdd, addInvite, invites}) => {
     const isLoading = useSelector(state => state.allUsers.isLoading);
     const hasError = useSelector(state => state.allUsers.hasError);
 
-    const currentUser = useSelector(state => state.currentUser.personData);
-    const isCurrentUserLoading = useSelector(state => state.currentUser.isLoading);
-    const hasCurrentUserError = useSelector(state => state.currentUser.hasError);
-
     const [filter, setFilter] = useState('');
     const [notification, setNotification] = useState('');
     const [userFound, setUserFound] = useState();
 
-    if(isLoading || isCurrentUserLoading){
+    if(isLoading){
         return <p>Loading</p>
     }
 
-    if(hasError || hasCurrentUserError){
+    if(hasError){
         return <p>Has Error</p>
     }    
 
@@ -34,7 +30,7 @@ const SearchUsersModal = ({showAdd, closeAdd, addInvite, invites}) => {
     const findUser = () => {
         const user = allUsers.find(user => user.username === filter);
         if(user){
-            if(user?.name === currentUser.name){
+            if(user?.id === JSON.parse(localStorage.getItem("id"))){
                 setNotification('Cannot add Yourself')
             } 
             else{

@@ -14,9 +14,6 @@ const projectKanban = () => {
   let allBugs = useSelector(state => state.currentProject.projectData.bugs);
   const isLoading = useSelector(state=>state.currentProject.isLoading);
   const hasError = useSelector(state=>state.currentProject.hasError);
-  
-  const[taskSelected, setTaskSelected] = useState();
-  const[bugSelected, setBugSelected] = useState();
 
   if(isLoading){
     return <p>Is Loading</p>

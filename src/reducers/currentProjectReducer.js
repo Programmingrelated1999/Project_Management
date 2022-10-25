@@ -17,6 +17,12 @@ export const createANewProject = async(projectData) => {
   return response.data;
 }
 
+export const editSelectedProject = async(id, data) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.put(`http://localhost:3001/api/projects/${id}`, data, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentProjectSlice = createSlice({
   name: 'currentProject',
