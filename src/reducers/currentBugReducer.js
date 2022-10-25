@@ -16,6 +16,12 @@ export const deleteSelectedBug = async(id) => {
   return response.data;
 }
 
+export const editSelectedBug = async(id, data) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.put(`http://localhost:3001/api/bugs/${id}`, data, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentBugSlice = createSlice({
   name: 'currentBug',

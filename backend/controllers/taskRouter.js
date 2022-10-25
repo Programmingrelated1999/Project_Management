@@ -154,6 +154,9 @@ taskRouter.put("/:id", async(request, response) => {
     }
 
     taskToUpdate.status = request.body.status? request.body.status: taskToUpdate.status;
+    if(request.body){
+        console.log("Status", request.body);
+    }
     const savedTask = await taskToUpdate.save();
     response.json(savedTask);
 })

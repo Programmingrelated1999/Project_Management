@@ -1,10 +1,15 @@
 import React, {useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Column from '../Kanban/Column';
+
+import {editSelectedTask} from "../../../reducers/currentTaskReducer";
+import {editSelectedBug} from "../../../reducers/currentBugReducer";
+import { loadCurrentProjectData } from '../../../reducers/currentProjectReducer';
 
 const projectKanban = () => {
 
+  const dispatch = useDispatch();
+  let currentProjectId = useSelector(state => state.currentProject.projectData.id);
   let allTasks = useSelector(state => state.currentProject.projectData.tasks);
   let allBugs = useSelector(state => state.currentProject.projectData.bugs);
   const isLoading = useSelector(state=>state.currentProject.isLoading);
@@ -47,10 +52,59 @@ const projectKanban = () => {
     {name: "Done", taskList: tasksDone, bugList: bugsDone},
   ]
 
+  const handleForwardClick = async ({id, status, type}) => {
+    let newStatus;
+    if(status === 'Created'){
+      newStatus = 'Progress'
+    }
+    if(status === 'Progress'){
+      newStatus = "Done"
+    }
+    if(type == 'Task'){
+      let data = {
+        status: newStatus
+      }
+      await editSelectedTask(id, data);
+      await dispatch(loadCurrentProjectData(currentProjectId));
+    }
+    if(type == 'Bug'){
+      let data = {
+        status: newStatus
+      }
+      await editSelectedBug(id, data);
+      await dispatch(loadCurrentProjectData(currentProjectId));
+    }
+  }
+
+  const handlePreviousClick = async ({id, status, type}) => {
+    let newStatus;
+    if(status === 'Progress'){
+      newStatus = 'Created'
+    }
+    if(status === 'Done'){
+      newStatus = "Progress"
+    }
+    if(type == 'Task'){
+      let data = {
+        status: newStatus
+      }
+      await editSelectedTask(id, data);
+      await dispatch(loadCurrentProjectData(currentProjectId));
+    }
+    if(type == 'Bug'){
+      let data = {
+        status: newStatus
+      }
+      console.log("Data", data);
+      await editSelectedBug(id, data);
+      await dispatch(loadCurrentProjectData(currentProjectId));
+    }
+  }
+
   return (
     <div className="d-flex justify-content-around">
       {columns.map((column) => 
-          <Column name = {column.name} tasks = {column.taskList} bugs = {column.bugList} key={column.name}></Column>)}
+          <Column name = {column.name} tasks = {column.taskList} bugs = {column.bugList} key={column.name} handleForwardClick = {handleForwardClick} handlePreviousClick={handlePreviousClick}></Column>)}
     </div>
   )
 }
