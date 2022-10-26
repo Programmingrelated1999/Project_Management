@@ -93,6 +93,8 @@ projectRouter.put("/:id", async(request, response) => {
   //get the project to be updated and store it in projectToUpdate variable.
   const projectToUpdate = await Projects.findById(request.params.id);
 
+  console.log("Request body Users", request.body);
+
   const token = getTokenFrom(request);
   const decodedToken = jwt.verify(token, process.env.SECRET);
   //if decode not successful, token is not valid.
@@ -134,6 +136,34 @@ projectRouter.put("/:id", async(request, response) => {
           projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
           projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
           projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
+
+          let userTasks = [];
+          let userBugs = [];
+
+          for(let task of projectToUpdate.tasks){
+            if(userToRemove.tasks.includes(task)){
+              userTasks = userTasks.concat(task);
+            }
+          }
+          for(let bug of projectToUpdate.bugs){
+            if(userToRemove.bugs.includes(bug)){
+              userBugs = userBugs.concat(bug);
+            }
+          }
+
+          for(let task of userTasks){
+            const taskToUpdate = await Tasks.findById(task);
+            taskToUpdate.assigned = taskToUpdate.assigned.filter(user => String(user) !== String(userToRemove._id));
+            userToRemove.tasks = userToRemove.tasks.filter(task => String(task) !== String(taskToUpdate._id));
+            await taskToUpdate.save();
+          }
+          for(let bug of userBugs){
+            const bugToUpdate = await Bugs.findById(bug);
+            bugToUpdate.assigned = bugToUpdate.assigned.filter(user => String(user) !== String(userToRemove._id));
+            userToRemove.tasks = userToRemove.tasks.filter(bug => String(bug) !== String(bugToUpdate._id));
+            await bugToUpdate.save();
+          }
+
           //remove project from usrs
           userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
           userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
@@ -150,6 +180,33 @@ projectRouter.put("/:id", async(request, response) => {
           projectToUpdate.developers = projectToUpdate.developers.filter((userElement) => String(userElement) !== String(userToRemove._id));
           projectToUpdate.clients = projectToUpdate.clients.filter((userElement) => String(userElement) !== String(userToRemove._id));
           projectToUpdate.invites = projectToUpdate.invites.filter((userElement) => String(userElement) !== String(userToRemove._id));
+          let userTasks = [];
+          let userBugs = [];
+
+          for(let task of projectToUpdate.tasks){
+            if(userToRemove.tasks.includes(task)){
+              userTasks = userTasks.concat(task);
+            }
+          }
+          for(let bug of projectToUpdate.bugs){
+            if(userToRemove.bugs.includes(bug)){
+              userBugs = userBugs.concat(bug);
+            }
+          }
+
+          for(let task of userTasks){
+            const taskToUpdate = await Tasks.findById(task);
+            taskToUpdate.assigned = taskToUpdate.assigned.filter(user => String(user) !== String(userToRemove._id));
+            userToRemove.tasks = userToRemove.tasks.filter(task => String(task) !== String(taskToUpdate._id));
+            await taskToUpdate.save();
+          }
+          for(let bug of userBugs){
+            const bugToUpdate = await Bugs.findById(bug);
+            bugToUpdate.assigned = bugToUpdate.assigned.filter(user => String(user) !== String(userToRemove._id));
+            userToRemove.tasks = userToRemove.tasks.filter(bug => String(bug) !== String(bugToUpdate._id));
+            await bugToUpdate.save();
+          }
+
           //remove project from usrs
           userToRemove.projectInvites = userToRemove.projectInvites.filter((projectInviteElement) => String(projectInviteElement) !== String(projectToUpdate._id));
           userToRemove.projects = userToRemove.projects.filter((projectElement) => String(projectElement) !== String(projectToUpdate._id));
@@ -158,7 +215,6 @@ projectRouter.put("/:id", async(request, response) => {
         }
       }
     }
-
     const savedProject = await projectToUpdate.save();
     response.json(savedProject);
   } else {

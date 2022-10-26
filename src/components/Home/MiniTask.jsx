@@ -8,7 +8,7 @@ const MiniTask = ({tasks}) => {
   }
 
   return (
-    <Table striped bordered hover size="sm">
+    <Table>
       <thead>
         <tr>
           <th>Tasks Name</th>

@@ -1,11 +1,19 @@
 import React, {useState, useRef, useEffect} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {Form, Button, Card} from "react-bootstrap"
+import {Form, Button, Card, Table} from "react-bootstrap"
 import { editSelectedProject, loadCurrentProjectData } from '../../../reducers/currentProjectReducer'
 import SearchUsersModal from '../Modals/SearchUsersModal'
 import { Button as MaterialUIButton } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { loadAllUsersData } from '../../../reducers/allUsersReducer'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteProjectMemberModal from '../Modals/DeleteProjectMemberModal';
+import { Chip } from '@mui/material';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import {IconButton, Tooltip} from '@mui/material'
+
+import "./ProjectSetting.css";
 
 const ProjectSetting = () => {
 
@@ -27,8 +35,10 @@ const ProjectSetting = () => {
   const description = useRef();
 
   const [showAdd, setShowAdd] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [invites, setInvites] = useState([]);
   const [notification, setNotification] = useState('');
+  const [userToKick, setUserToKick] = useState();
 
   if(isCurrentProjectLoading || allUsersIsLoading){
     return <p>Loading</p>
@@ -53,8 +63,19 @@ const ProjectSetting = () => {
   const closeAdd = () => {
     setShowAdd(false);
   }
+  const openDelete = () => {
+    setShowDelete(true);
+  }
+  const closeDelete = () => {
+    setShowDelete(false);
+  }
   const addInvite = (invitedPerson) => {
     setInvites(invites.concat(invitedPerson));
+  }
+  const handleOpenDelete = (person) => {
+    openDelete();
+    console.log("Got here ")
+    setUserToKick(person)
   }
   const removeInvite = (inviteId) => {
     const newInviteList = invites.filter((invite) => invite.id !== inviteId);
@@ -80,14 +101,17 @@ const ProjectSetting = () => {
         setNotification("");
       }, 4000)
     } else{
+      const inviteList = invites.map(invite => invite.id);
       const data = {
         name: name.current.value, 
-        description: description.current.value
+        description: description.current.value,
+        addInvites: inviteList
       }
       console.log("Data", data);
       const id = currentProject.id;
       await editSelectedProject(id, data);
       await dispatch(loadCurrentProjectData(id));
+      setInvites([])
     }
   }
 
@@ -117,9 +141,56 @@ const ProjectSetting = () => {
         <Button variant="success" className='buttons-vertical mx-auto' onClick = {openAdd}>Add Users</Button>
         <br />
 
+        <h3>Current Member List:</h3>
+        <Table>
+          <thead>
+            <tr>  
+              <th>Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Actions</th>
+              <th>Kick Out</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr key = {currentProject.creator.id}>
+              <td>{currentProject.creator.name}</td>
+              <td>{currentProject.creator.username}</td>
+              <td>                
+              <Chip label="Creator" color = "error"/>
+              </td>
+              <td></td>
+              <td><MaterialUIButton variant="outlined" color="error"><DeleteForeverIcon/></MaterialUIButton></td>
+            </tr>
+            {currentProject.admins.map(admin => <tr key = {admin.id}>
+              <td>{admin.name}</td>
+              <td>{admin.username}</td>
+              <td>
+                <Chip label="Admin" color = "warning"/>
+              </td>
+              <td>                
+                <Tooltip title="Demote to Developer"><IconButton aria-label="delete" size="small" color = "error"><ArrowDownwardIcon/></IconButton></Tooltip>
+              </td>
+              <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(admin)}><DeleteForeverIcon/></MaterialUIButton></td>
+            </tr>)}
+            {currentProject.developers.map(developer => <tr key = {developer.id}>
+              <td>{developer.name}</td>
+              <td>{developer.username}</td>
+              <td>                
+                <Chip label="Developer" color = "secondary" />
+              </td>
+              <td>
+                <Tooltip title="Promote to Admin"><IconButton aria-label="delete" size="small" color = "success"><ArrowUpwardIcon/></IconButton></Tooltip>
+              </td>
+              <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(developer)}><DeleteForeverIcon/></MaterialUIButton></td>
+            </tr>)}
+          </tbody>
+        </Table>
+          {currentProject.admins.map(admin => <p>{admin.name}</p>)}
         <Button variant="success" type="submit" className='buttons-vertical mx-auto'>Submit</Button>
       </Form>
       </Card>
+      {userToKick ? <DeleteProjectMemberModal showDelete = {showDelete} closeDelete = {closeDelete} userToKick = {userToKick}/>: null}
     </div>
   )
 }

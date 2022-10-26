@@ -64,6 +64,7 @@ const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
             assigned,
         }
         const id = currentTask.id
+        console.log()
         await editSelectedTask(id, data);
         await dispatch(loadCurrentProjectData(currentProject.id));
         setNotification('');
