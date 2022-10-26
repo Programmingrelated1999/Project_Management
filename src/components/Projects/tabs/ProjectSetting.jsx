@@ -190,8 +190,8 @@ const ProjectSetting = () => {
               <td>
                 <Chip label="Admin" color = "warning"/>
               </td>
-              <td>                
-                <Tooltip title="Demote to Developer"><IconButton aria-label="demote" size="small" color = "error" onClick = {() => handlePromoteDemote({type: "Demote", person: admin})}><ArrowDownwardIcon/></IconButton></Tooltip>
+              <td>
+              <Tooltip title="Demote to Developer"><IconButton aria-label="demote" size="small" color = "error" disabled = {!isUserCreator} onClick = {() => handlePromoteDemote({type: "Demote", person: admin})}><ArrowDownwardIcon/></IconButton></Tooltip>                
               </td>
               <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(admin)}><DeleteForeverIcon/></MaterialUIButton></td>
             </tr>)}
@@ -202,7 +202,7 @@ const ProjectSetting = () => {
                 <Chip label="Developer" color = "secondary" />
               </td>
               <td>
-                <Tooltip title="Promote to Admin"><IconButton aria-label="promote" size="small" color = "success" onClick = {() => handlePromoteDemote({type: "Promote", person: developer})}><ArrowUpwardIcon/></IconButton></Tooltip>
+                <Tooltip title="Promote to Admin"><IconButton aria-label="promote" size="small" color = "success" disabled = {!(isUserAdmin || isUserCreator)} onClick = {() => handlePromoteDemote({type: "Promote", person: developer})}><ArrowUpwardIcon/></IconButton></Tooltip>
               </td>
               <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(developer)}><DeleteForeverIcon/></MaterialUIButton></td>
             </tr>)}
