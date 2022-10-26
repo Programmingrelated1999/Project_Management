@@ -14,6 +14,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import {IconButton, Tooltip} from '@mui/material'
 
 import "./ProjectSetting.css";
+import ChangeUserRoleModal from '../Modals/ChangeUserRoleModal'
 
 const ProjectSetting = () => {
 
@@ -36,9 +37,12 @@ const ProjectSetting = () => {
 
   const [showAdd, setShowAdd] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [showPromoteDemote, setShowPromoteDemote] = useState(false);
   const [invites, setInvites] = useState([]);
   const [notification, setNotification] = useState('');
   const [userToKick, setUserToKick] = useState();
+  const [userToChangeStatus, setUserToChangeStatus] = useState();
+  const [newUserRole, setNewUserRole] = useState();
 
   if(isCurrentProjectLoading || allUsersIsLoading){
     return <p>Loading</p>
@@ -69,6 +73,13 @@ const ProjectSetting = () => {
   const closeDelete = () => {
     setShowDelete(false);
   }
+  const openUserChangeStatus = () => {
+    setShowPromoteDemote(true);
+  }
+  const closeUserChangeStatus = () => {
+    setShowPromoteDemote(false);
+  }
+
   const addInvite = (invitedPerson) => {
     setInvites(invites.concat(invitedPerson));
   }
@@ -80,6 +91,17 @@ const ProjectSetting = () => {
   const removeInvite = (inviteId) => {
     const newInviteList = invites.filter((invite) => invite.id !== inviteId);
     setInvites(newInviteList);
+  }
+  const handlePromoteDemote = ({type, person}) => {
+    if(type === "Promote"){
+      openUserChangeStatus();
+      setUserToChangeStatus(person);
+      setNewUserRole("admin");
+    } else{
+      openUserChangeStatus();
+      setUserToChangeStatus(person);
+      setNewUserRole("developer");
+    }
   }
 
   const doesInviteListIncludesProjectMembers = () => {
@@ -169,7 +191,7 @@ const ProjectSetting = () => {
                 <Chip label="Admin" color = "warning"/>
               </td>
               <td>                
-                <Tooltip title="Demote to Developer"><IconButton aria-label="delete" size="small" color = "error"><ArrowDownwardIcon/></IconButton></Tooltip>
+                <Tooltip title="Demote to Developer"><IconButton aria-label="demote" size="small" color = "error" onClick = {() => handlePromoteDemote({type: "Demote", person: admin})}><ArrowDownwardIcon/></IconButton></Tooltip>
               </td>
               <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(admin)}><DeleteForeverIcon/></MaterialUIButton></td>
             </tr>)}
@@ -180,17 +202,17 @@ const ProjectSetting = () => {
                 <Chip label="Developer" color = "secondary" />
               </td>
               <td>
-                <Tooltip title="Promote to Admin"><IconButton aria-label="delete" size="small" color = "success"><ArrowUpwardIcon/></IconButton></Tooltip>
+                <Tooltip title="Promote to Admin"><IconButton aria-label="promote" size="small" color = "success" onClick = {() => handlePromoteDemote({type: "Promote", person: developer})}><ArrowUpwardIcon/></IconButton></Tooltip>
               </td>
               <td><MaterialUIButton variant="outlined" color="error" onClick = {() => handleOpenDelete(developer)}><DeleteForeverIcon/></MaterialUIButton></td>
             </tr>)}
           </tbody>
         </Table>
-          {currentProject.admins.map(admin => <p>{admin.name}</p>)}
         <Button variant="success" type="submit" className='buttons-vertical mx-auto'>Submit</Button>
       </Form>
       </Card>
       {userToKick ? <DeleteProjectMemberModal showDelete = {showDelete} closeDelete = {closeDelete} userToKick = {userToKick}/>: null}
+      {userToChangeStatus? <ChangeUserRoleModal showPromoteDemote={showPromoteDemote} closeUserChangeStatus={closeUserChangeStatus} userToChangeStatus={userToChangeStatus} newUserRole={newUserRole}/>: null}
     </div>
   )
 }
