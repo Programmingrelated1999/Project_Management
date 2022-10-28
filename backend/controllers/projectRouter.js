@@ -1,5 +1,6 @@
 //create projectRouter from express Router module
 const projectRouter = require("express").Router();
+const moment = require('moment');
 
 //require jwt
 const jwt = require('jsonwebtoken');
@@ -58,7 +59,7 @@ projectRouter.post("/", async (request, response) => {
   const project = new Projects({
     name: request.body.name,
     description: request.body.description,
-    createdDate: Date.now(),
+    createdDate: new Date().toDateString(),
     creator: creator.id,
   });
 
@@ -215,6 +216,10 @@ projectRouter.put("/:id", async(request, response) => {
         }
       }
     }
+
+    if(request.body.endDate){
+      projectToUpdate.endDate = request.body.endDate;
+    }
     const savedProject = await projectToUpdate.save();
     response.json(savedProject);
   } else {
@@ -241,7 +246,7 @@ projectRouter.put("/:id/changeStatus", async(request, response) => {
     return response.status(401).json({error: "User must be part of the development team to work on the project"});
   } else{
     projectToUpdate.status = request.body.status;
-    const updatedProject = await projectToUpdate.save();
+    await projectToUpdate.save();
   }
   response.json(projectToUpdate);
 })
@@ -305,7 +310,7 @@ projectRouter.delete("/:id", async (request, response) => {
         await userToUpdate.save();
         }
         await taskToDelete.remove();
-    };
+    }
 
     //delete bug
     for(let bug of project.bugs){
@@ -316,7 +321,7 @@ projectRouter.delete("/:id", async (request, response) => {
             await userToUpdate.save();
         }
         await bugToDelete.remove();
-    };
+    }
 
     //delete creator
     const creator = await Users.findById(project.creator);

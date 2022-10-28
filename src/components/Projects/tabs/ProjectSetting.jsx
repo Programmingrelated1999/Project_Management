@@ -12,6 +12,9 @@ import { Chip } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import {IconButton, Tooltip} from '@mui/material'
+import { DatePicker } from '@mantine/dates'
+import {Stack, TextField} from '@mui/material'
+import moment from 'moment/moment'
 
 import "./ProjectSetting.css";
 import ChangeUserRoleModal from '../Modals/ChangeUserRoleModal'
@@ -24,13 +27,10 @@ const ProjectSetting = () => {
   const isCurrentProjectLoading = useSelector(state => state.currentProject.isLoading);
   const hasCurrentProjectError = useSelector(state => state.currentProject.hasError);
 
-  const allUsers = useSelector(state => state.allUsers.allUsersData);
   const allUsersIsLoading = useSelector(state => state.allUsers.isLoading);
   const allUsersHasError = useSelector(state => state.allUsers.hasError);
 
   useEffect(() => {dispatch(loadAllUsersData())}, [])
-
-  console.log("all users", allUsers);
 
   const name = useRef();
   const description = useRef();
@@ -43,6 +43,9 @@ const ProjectSetting = () => {
   const [userToKick, setUserToKick] = useState();
   const [userToChangeStatus, setUserToChangeStatus] = useState();
   const [newUserRole, setNewUserRole] = useState();
+  const [endDate, setEndDate] = useState(new Date());
+
+  const momentCreatedDate = moment(currentProject.createdDate, 'YYYY-MM-DD');
 
   if(isCurrentProjectLoading || allUsersIsLoading){
     return <p>Loading</p>
@@ -79,7 +82,6 @@ const ProjectSetting = () => {
   const closeUserChangeStatus = () => {
     setShowPromoteDemote(false);
   }
-
   const addInvite = (invitedPerson) => {
     setInvites(invites.concat(invitedPerson));
   }
@@ -91,6 +93,11 @@ const ProjectSetting = () => {
   const removeInvite = (inviteId) => {
     const newInviteList = invites.filter((invite) => invite.id !== inviteId);
     setInvites(newInviteList);
+  }
+  const handleEndDate = (value) => {
+    const dateFormatEndDate = moment(value).toISOString();
+    console.log("dateFormatEndDate", dateFormatEndDate);
+    setEndDate(dateFormatEndDate);
   }
   const handlePromoteDemote = ({type, person}) => {
     if(type === "Promote"){
@@ -129,6 +136,9 @@ const ProjectSetting = () => {
         description: description.current.value,
         addInvites: inviteList
       }
+      if(endDate){
+        data.endDate = endDate;
+      }
       console.log("Data", data);
       const id = currentProject.id;
       await editSelectedProject(id, data);
@@ -136,6 +146,19 @@ const ProjectSetting = () => {
       setInvites([])
     }
   }
+
+  const checkDueDate = (createdDate, endDate) => {
+    if(!endDate){
+      return false;
+    }
+    if(createdDate < endDate){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  const due = checkDueDate(currentProject.createdDate, endDate);
 
   return (
     <div className = "d-flex flex-column align-items-center my-5">
@@ -150,6 +173,23 @@ const ProjectSetting = () => {
         <Form.Group className="d-flex mb-3 d-flex flex-column align-items-center" controlId="projectDescription">
           <Form.Label className = "mx-2 d-flex flex-column align-items-center">Description</Form.Label>
           <textarea rows="4" cols="50" defaultValue = {currentProject.description} ref = {description}/>
+        </Form.Group>
+
+        <Form.Group className="d-flex mb-3 d-flex flex-column align-items-center" controlId="projectDescription">
+          <Form.Label className = "mx-2 d-flex flex-column align-items-center">
+          <span className='my-1'>Current Date Range: &nbsp;
+          <span className='text-success'>{moment(currentProject.createdDate).format("YYYY-MM-DD")}</span> to &nbsp;
+          {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("YYYY-MM-DD")}</span>:<span>N/A</span>}
+          </span>
+          <h6>Change End Date</h6>
+          <DatePicker
+            label="Pick End Date"
+            value={endDate}
+            onChange={(newValue) => {
+              handleEndDate(newValue);
+            }}
+          />
+          </Form.Label>
         </Form.Group>
 
         <div className = "d-block">
@@ -211,7 +251,7 @@ const ProjectSetting = () => {
         <Button variant="success" type="submit" className='buttons-vertical mx-auto'>Submit</Button>
       </Form>
       </Card>
-      {userToKick ? <DeleteProjectMemberModal showDelete = {showDelete} closeDelete = {closeDelete} userToKick = {userToKick}/>: null}
+      {userToKick? <DeleteProjectMemberModal showDelete = {showDelete} closeDelete = {closeDelete} userToKick = {userToKick}/>: null}
       {userToChangeStatus? <ChangeUserRoleModal showPromoteDemote={showPromoteDemote} closeUserChangeStatus={closeUserChangeStatus} userToChangeStatus={userToChangeStatus} newUserRole={newUserRole}/>: null}
     </div>
   )

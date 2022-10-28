@@ -5,6 +5,8 @@ import { useParams } from 'react-router';
 import { loadCurrentProjectData } from '../../reducers/currentProjectReducer';
 import SideNavbar from '../commonlyUsedComponents/SideNavbar';
 
+import moment from 'moment';
+
 import "./projectHome.css";
 
 const ProjectHome = () => {
@@ -31,8 +33,10 @@ const ProjectHome = () => {
         <div>
             <h4 className = "project-detail-header">{currentProject.name}</h4>
             <h6 className = "project-detail-header">Description: {currentProject.description}</h6>
-            <p className = "project-detail-header">Created On: {currentProject.createdDate}</p>
-            {currentProject.endDate? <p className = "project-detail-header">currentProject.endDate</p>: <p className = "project-detail-header">End Date: N/A</p>}
+            <span className='my-1'>Project Date Range: &nbsp;
+                <span className='text-success'>{moment(currentProject.createdDate).format("MMM-DD-YYYY")}</span> to &nbsp;
+                {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("MMM-DD-YYYY")}</span>:<span>N/A</span>}
+            </span>
             <SideNavbar/>
         </div>
     )

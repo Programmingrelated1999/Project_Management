@@ -57,7 +57,7 @@ bugRouter.post("/", async (request, response) => {
     if(isUserCreator || isUserAdmin){
         const bug = new Bugs({
             name: request.body.name,
-            createdDate: Date.now(),
+            createdDate: new Date().toDateString(),
             description: request.body.description,
             project: project._id,
         });

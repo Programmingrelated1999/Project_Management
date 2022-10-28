@@ -57,7 +57,7 @@ taskRouter.post("/", async (request, response) => {
         //createe a task object
         let task = new Tasks({
             name: request.body.name,
-            createdDate: Date.now(),
+            createdDate: new Date().toDateString(),
             description: request.body.description,
             project: project._id,
         });
