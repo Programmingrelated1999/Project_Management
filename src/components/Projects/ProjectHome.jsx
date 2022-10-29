@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 import { loadCurrentProjectData } from '../../reducers/currentProjectReducer';
 import SideNavbar from '../commonlyUsedComponents/SideNavbar';
+import { Chip } from '@mui/material';
+import ProjectServices from "../../services/currentProjectServices"
 
 import moment from 'moment';
 
@@ -15,8 +17,8 @@ const ProjectHome = () => {
 
     //get Current Project
     const currentProject = useSelector(state => state.currentProject.projectData);
-    const isLoading = useSelector(state => state.currentProject.projectData.isLoading);
-    const hasError= useSelector(state => state.currentProject.projectData.hasError);
+    const isLoading = useSelector(state => state.currentProject.isLoading);
+    const hasError= useSelector(state => state.currentProject.hasError);
 
     //useEffect
     useEffect(() => {dispatch(loadCurrentProjectData(id))}, [id]);
@@ -29,6 +31,8 @@ const ProjectHome = () => {
         return <p>Has Error</p>
     }
 
+    const isDue = ProjectServices.checkDueDate(currentProject.createdDate, currentProject.endDate);
+
     return (
         <div>
             <h4 className = "project-detail-header">{currentProject.name}</h4>
@@ -37,6 +41,8 @@ const ProjectHome = () => {
                 <span className='text-success'>{moment(currentProject.createdDate).format("MMM-DD-YYYY")}</span> to &nbsp;
                 {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("MMM-DD-YYYY")}</span>:<span>N/A</span>}
             </span>
+            <h6>Project Deadline: <Chip label = {isDue? "Due": "Not Due"} size = "small"/></h6>
+            <h6>Project Status: <Chip label = {currentProject.status? "Complete": "Not Complete"} size = "small"/></h6>
             <SideNavbar/>
         </div>
     )

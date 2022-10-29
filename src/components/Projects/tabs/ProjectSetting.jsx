@@ -13,7 +13,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import {IconButton, Tooltip} from '@mui/material'
 import { DatePicker } from '@mantine/dates'
-import {Stack, TextField} from '@mui/material'
+import ProjectServices from "../../../services/currentProjectServices"
 import moment from 'moment/moment'
 
 import "./ProjectSetting.css";
@@ -147,18 +147,7 @@ const ProjectSetting = () => {
     }
   }
 
-  const checkDueDate = (createdDate, endDate) => {
-    if(!endDate){
-      return false;
-    }
-    if(createdDate < endDate){
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  const due = checkDueDate(currentProject.createdDate, endDate);
+  const due = ProjectServices.checkDueDate(currentProject.createdDate, endDate);
 
   return (
     <div className = "d-flex flex-column align-items-center my-5">
@@ -183,7 +172,6 @@ const ProjectSetting = () => {
           </span>
           <h6>Change End Date</h6>
           <DatePicker
-            label="Pick End Date"
             value={endDate}
             onChange={(newValue) => {
               handleEndDate(newValue);
