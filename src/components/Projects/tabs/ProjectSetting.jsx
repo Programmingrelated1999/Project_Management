@@ -147,10 +147,16 @@ const ProjectSetting = () => {
     }
   }
 
+  const handleProjectDelete = (event) => {
+    event.preventDefault();
+    
+  }
+
   const due = ProjectServices.checkDueDate(currentProject.createdDate, endDate);
 
   return (
-    <div className = "d-flex flex-column align-items-center my-5">
+    <div className = "d-flex flex-column align-items-center my-1">
+      {isUserCreator? <Button className = "my-3 btn btn-danger" onClick = {handleProjectDelete}>Delete This Project</Button>: null}
       <Card className = 'px-5'>
       <Form onSubmit = {handleSubmit} className = "d-flex flex-column align-items-center">
         {notification? <p className = "text-danger">{notification}</p>: null}

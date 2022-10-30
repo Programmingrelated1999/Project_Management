@@ -29,6 +29,12 @@ export const changeUserRoleInProject = async(id, userId, data) => {
   return response.data;
 }
 
+export const deleteSelectedProject = async(projectId) => {
+  const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
+  const response = await axios.delete(`http://localhost:3001/api/projects/${projectId}`, {headers: {Authorization: token}});
+  return response.data;
+}
+
 //currentUserSlice
 const currentProjectSlice = createSlice({
   name: 'currentProject',

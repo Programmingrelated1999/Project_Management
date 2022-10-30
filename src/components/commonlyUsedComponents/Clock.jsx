@@ -13,7 +13,7 @@ const Clock = () => {
         <div className = "clock-display my-1">
             <Chip label = {`${moment(clock).format("MMM DD YYYY")}`} color = "success" className = "time"/>
             <br/>
-            <h2 className='text-danger'>{moment(clock).format("HH:mm:ss a")}</h2>
+            <h2 className='text-danger'>{moment(clock).format("h:mm:ss a")}</h2>
         </div>
     </div>
   )

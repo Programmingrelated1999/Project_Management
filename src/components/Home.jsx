@@ -19,17 +19,23 @@ const Home =  () => {
   const currentUserProjectInvites = useSelector(state => state.currentUser.personData.projectInvites)
   const currentUserTasks = useSelector(state => state.currentUser.personData.tasks)
   const currentUserBugs = useSelector(state => state.currentUser.personData.bugs)
-  const userId = useSelector(state => state.currentUser.personData.id)
-  const name = useSelector(state => state.currentUser.personData.name)
+  const isLoading = useSelector(state => state.currentUser.isLoading);
+  const hasError = useSelector(state => state.currentUser.hasError);
+  const userId = useSelector(state => state.currentUser.personData.id);
+  const name = useSelector(state => state.currentUser.personData.name);
 
   console.log("User Id", userId);
 
   const dispatch = useDispatch();
 
-  if(!currentUserProjectInvites){
+  if(!currentUserProjectInvites || isLoading){
     return(
       <p>Loading... </p>
     )
+  }
+
+  if(hasError){
+    return (<p>Has Error</p>)
   }
 
   const handleAcceptInvite = async (projectId) => {

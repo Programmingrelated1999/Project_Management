@@ -35,7 +35,7 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
               <td>{bug.name}</td>
               <td>{bug.project.name}</td>
               <td><Chip label = "Bug" color = "success" size = "small"/></td>
-              <td><Link to = {`projects/${bug.project.id}`}><Button className = "btn btn-wasrning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
+              <td><Link to = {`projects/${bug.project.id}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
             </tr>)
           }
         </tbody>

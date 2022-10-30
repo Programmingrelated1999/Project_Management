@@ -300,7 +300,6 @@ projectRouter.delete("/:id", async (request, response) => {
   if(!isUserCreator(project, deleter._id)){
     return response.status(401).json({error: "Not Authorized"});
   }
-
       //delete task
       for(let task of project.tasks){
         const taskToDelete = await Tasks.findById(task);

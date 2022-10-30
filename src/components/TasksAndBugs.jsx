@@ -24,7 +24,7 @@ const TasksAndBugs = () => {
 
   const bugsCreated = currentUserBugs.filter(bug => bug.status === 'Created');
   const bugsProgress = currentUserBugs.filter(bug => bug.status === 'Progress');
-  const bugsDone = currentUserBugs.filter(bug => bug``.status === 'Done');
+  const bugsDone = currentUserBugs.filter(bug => bug.status === 'Done');
 
   console.log("Not Started", tasksCreated);
   console.log("Progress", tasksProgress);

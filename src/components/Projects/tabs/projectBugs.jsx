@@ -1,16 +1,31 @@
 import React, {useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 
-import ProjectTaskCard from '../Tasks/ProjectTaskCard';
-import DeleteModal from '../Tasks/Modals/DeleteModal';
+//components
+import ProjectBugCard from '../Bugs/ProjectBugCard';
+import DeleteBugModal from '../Bugs/Modals/DeleteBugModal';
 import ViewBugModal from '../Bugs/Modals/ViewBugModal';
+import EditBugModal from '../Bugs/Modals/EditBugModal';
 
+//other components
+import { Container, Button } from 'react-bootstrap';
+
+//reducer actions
 import { deleteSelectedBug } from '../../../reducers/currentBugReducer';
+import CreateANewBugModal from "../Bugs/Modals/CreateANewBugModal"
 
 const ProjectBugs = () => {
   const bugs = useSelector(state => state.currentProject.projectData.bugs);
   const isLoading = useSelector(state => state.currentProject.isLoading);
   const hasError = useSelector(state => state.currentProject.hasError);
+
+  //view details, edit and delete modals variables
+  const [showViewDetails, setShowViewDetails] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showCreateBug, setShowCreateBug] = useState(false);
+  const [bugSelected, setBugSelected] = useState('');
+  const [isDelete, setIsDelete] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -22,12 +37,21 @@ const ProjectBugs = () => {
     return <p>Has Error</p>
   }
 
-  //view details, edit and delete modals variables
-  const [showViewDetails, setShowViewDetails] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [bugSelected, setBugSelected] = useState('');
-  const [isDelete, setIsDelete] = useState(false);
+  //check if the user is admin or creator
+  /*
+  let isAuthorized = false;
+  const userId = JSON.parse(localStorage.getItem("id"));
+  console.log("userId", userId);
+  console.log("creator id", currentProject.creator.id);
+  if(userId === currentProject.creator.id){
+    isAuthorized = true;
+  }
+  const adminIds = currentProject.admins.map((admin) => admin.id);
+  console.log(adminIds);
+  if(adminIds.includes(userId)){
+    isAuthorized = true;
+  }
+  */
 
   //modal handlers
   const openViewDetails = async (bugId) => {
@@ -36,11 +60,14 @@ const ProjectBugs = () => {
   }
   const openEdit = (bugId) => {
     setBugSelected(bugId);
-    setShowViewEdit(true);
+    setShowEdit(true);
   }
   const openDelete = (bugId) => {
     setBugSelected(bugId);
     setShowDelete(true);
+  }
+  const openCreateBug = () => {
+    setShowCreateBug(true);
   }
 
   const closeViewDetails = () => {
@@ -54,6 +81,10 @@ const ProjectBugs = () => {
   const closeDelete = () => {
     setBugSelected('');
     setShowDelete(false);
+  }
+  const closeCreateBug = () => {
+    setShowCreateBug(false);
+
   }
 
   const started = bugs.filter((bug) => bug.status === 'Created');
@@ -73,17 +104,26 @@ const ProjectBugs = () => {
     setShowDelete(false);
   }
 
+  const handleCreateBug = async (bug) => {
+    setShowCreateBug(false);
+  }
+
   return (
-    <div className='project-bugs'>
+    <div className='project-bugs'>    
+      <Container className = "text-center my-2">
+        <Button className = "btn btn-warning" onClick = {openCreateBug}>Create New Bug</Button>
+      </Container>
       <p>Started</p>
-        {started.map((bug) => <ProjectTaskCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} taskId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)}/>)}
+        {started.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}
       <p>Progress</p>
-        {progress.map((bug) => <ProjectTaskCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} taskId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)}/>)}  
+        {progress.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)} />)}  
       <p>Done</p>
-        {done.map((bug) => <ProjectTaskCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} taskId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = {( ) => openViewDetails(bug.id)}/>)}
+        {done.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = {( ) => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}
       
       {bugSelected? <ViewBugModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} bugSelected={bugSelected}/>: null}
-      <DeleteModal showDelete={showDelete} closeDelete = {closeDelete} loadDelete = {loadDelete} isDelete = {isDelete} handleDelete = {handleDelete}/>
+      {bugSelected? <EditBugModal showEdit={showEdit} closeEdit = {closeEdit} bugSelected={bugSelected}/> : null}
+      <DeleteBugModal showDelete={showDelete} closeDelete = {closeDelete} loadDelete = {loadDelete} isDelete = {isDelete} handleDelete = {handleDelete}/>
+      <CreateANewBugModal showCreateBug={showCreateBug} closeCreateBug={closeCreateBug} handleCreateBug = {handleCreateBug}/>
     </div>
   )
 }

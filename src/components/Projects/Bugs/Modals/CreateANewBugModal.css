@@ -1,0 +1,14 @@
+.text-input{
+    display: block;
+    margin-bottom: 2rem;
+}
+
+#outlined-multiline-static{
+    width: 30rem
+}
+
+.showAssignedUsers {
+    background-color: #ffa500;
+    color: green;
+    margin: 1rem;
+}
