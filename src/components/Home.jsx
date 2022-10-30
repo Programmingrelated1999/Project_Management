@@ -52,11 +52,9 @@ const Home =  () => {
         <div className = "d-flex justify-content-evenly">
           <SampleProjects />
           {currentUserProjectInvites.length === 0 ? 
-            <Card style={{ width: '18rem' }} className = "text-center">
-              <Card.Body>
-                <Card.Text>User Have No Invitations</Card.Text>
-              </Card.Body>
-            </Card>: 
+            <div style={{ width: '18rem' }} className = "text-center invitations">
+                <h6 className = "text-danger">User Have No Invitations</h6>
+            </div>: 
             <div style={{ height: '14rem', width: '22rem', overflow: "scroll" }}>
               <h3>Invitations</h3>
               <Table striped bordered hover size="sm">

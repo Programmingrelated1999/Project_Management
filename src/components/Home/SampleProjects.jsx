@@ -2,16 +2,17 @@ import React from 'react';
 
 //React Components
 import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import Launch from '@mui/icons-material/Launch';
+import { Link } from 'react-router-dom';
+import moment from 'moment/moment';
+import { Chip } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 
 const SampleProjects = () => {
 
-  const currentUser = useSelector(state => state.currentUser.userData);
+  const currentUser = useSelector(state => state.currentUser.personData);
   const isLoading = useSelector(state => state.currentUser.isLoading);
   const hasError = useSelector(state => state.currentUser.hasError);
 
@@ -23,15 +24,23 @@ const SampleProjects = () => {
     return <p>Has Error</p>
   }
 
+  const randomNum = Math.ceil(Math.random() * (currentUser.projects.length-1));
+  const randomProject = currentUser.projects[randomNum];
+
   return (
         <Card style={{ width: '25rem', height: '14rem'} }>
-            <Card.Header as="h5">Project 1</Card.Header>
+            <Card.Header as="h5">Jump into this Project</Card.Header>
             <Card.Body>
-              <Card.Title>UX Mobile</Card.Title>
+              <Card.Title>
+                {randomProject.name}
+              </Card.Title>
+              <Card.Subtitle>
+                <h6>From <span className='text-success'>{moment(randomProject.createdDate).format("MMM DD YYYY")}</span> To <span className='text-danger'>{randomProject.endDate? "N/A": moment(randomProject.endDate).format("MMM DD YYYY")}</span></h6>
+              </Card.Subtitle>
               <Card.Text>
-                Building a UX mobile design by Friday for WhatsAPP.
+                {randomProject.description}
               </Card.Text>
-              <Button variant="primary">Go To Project</Button>
+              <Link to = {`/projects/${randomProject.id}`}><Button variant="warning" size = "small">Go To Project<Launch/></Button></Link>
             </Card.Body>
           </Card>
   )

@@ -2,6 +2,7 @@ import React from 'react'
 import { Table, Button } from 'react-bootstrap';
 import { Chip } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
+import { Link } from 'react-router-dom';
 
 const MiniTaskAndBugs = ({tasks, bugs}) => {
 
@@ -26,7 +27,7 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
               <td>{task.name}</td>
               <td>{task.project.name}</td>
               <td><Chip label = "Task" color = "warning" size = "small"/></td>
-              <td><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></td>
+              <td><Link to = {`projects/${task.project.id}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
             </tr>)
           }
           {bugs.map((bug) =>     
@@ -34,7 +35,7 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
               <td>{bug.name}</td>
               <td>{bug.project.name}</td>
               <td><Chip label = "Bug" color = "success" size = "small"/></td>
-              <td><Button className = "btn btn-wasrning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></td>
+              <td><Link to = {`projects/${bug.project.id}`}><Button className = "btn btn-wasrning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
             </tr>)
           }
         </tbody>
