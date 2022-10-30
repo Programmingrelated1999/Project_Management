@@ -11,9 +11,9 @@
 }
 
 .calendarAndTask{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: 4rem;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 3rem;
 }
 
 .miniTask{

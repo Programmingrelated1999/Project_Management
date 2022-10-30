@@ -1,0 +1,46 @@
+import React from 'react'
+import { Table, Button } from 'react-bootstrap';
+import { Chip } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/Launch';
+
+const MiniTaskAndBugs = ({tasks, bugs}) => {
+
+  if(tasks.length === 0){
+    return <p>No Tasks assigned</p>
+  }
+
+  return (
+    <div overflow = "scrollable ">
+      <Table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>End Date</th>
+            <th>Category</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.map((task) =>     
+            <tr key = {task.id}>
+              <td>{task.name}</td>
+              <td>{task.project.name}</td>
+              <td><Chip label = "Task" color = "warning" size = "small"/></td>
+              <td><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></td>
+            </tr>)
+          }
+          {bugs.map((bug) =>     
+            <tr key = {bug.id}>
+              <td>{bug.name}</td>
+              <td>{bug.project.name}</td>
+              <td><Chip label = "Bug" color = "success" size = "small"/></td>
+              <td><Button className = "btn btn-wasrning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></td>
+            </tr>)
+          }
+        </tbody>
+      </Table>
+    </div>
+  )
+}
+
+export default MiniTaskAndBugs

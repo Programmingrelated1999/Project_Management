@@ -20,7 +20,6 @@ const ListItem = ({item, color}) => {
       <Card.Body>
       <Card.Title>{item.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{isDue? <Chip color = "error" label = "Due" size = "small"/>: <Chip color = "success" label = 'Not Due' size = "small"/>}</Card.Subtitle>
-        {item.status? <Chip color = "error" label = 'Not Complete' size = "small"/>: <Chip color = "success" label = "Complete" size = "small"/>}
         <Card.Text>{item.description}</Card.Text>
         <Link to = {`/projects/${item.project.id}`}><Button size = "sm" className = "btn btn-warning">Go To Project<LaunchIcon/></Button></Link>
       </Card.Body>

@@ -7,12 +7,24 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 
+import { useSelector } from 'react-redux';
+
 const SampleProjects = () => {
+
+  const currentUser = useSelector(state => state.currentUser.userData);
+  const isLoading = useSelector(state => state.currentUser.isLoading);
+  const hasError = useSelector(state => state.currentUser.hasError);
+
+  if(isLoading){
+    return <p>Is Loading</p>
+  }
+
+  if(hasError){
+    return <p>Has Error</p>
+  }
+
   return (
-    <Container >
-      <Row>
-        <Col>
-          <Card style={{ width: '25rem', height: '14rem'} }>
+        <Card style={{ width: '25rem', height: '14rem'} }>
             <Card.Header as="h5">Project 1</Card.Header>
             <Card.Body>
               <Card.Title>UX Mobile</Card.Title>
@@ -22,33 +34,6 @@ const SampleProjects = () => {
               <Button variant="primary">Go To Project</Button>
             </Card.Body>
           </Card>
-        </Col>
-        <Col>
-          <Card style={{ width: '25rem', height: '14rem'}}>
-            <Card.Header as="h5">Project 2</Card.Header>
-            <Card.Body>
-              <Card.Title>Game</Card.Title>
-              <Card.Text>
-                Build a Game with C++ Programming Language.
-              </Card.Text>
-              <Button variant="primary">Go To Project</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card style={{ width: '25rem', height: '14rem'}}>
-            <Card.Header as="h5">Project 3</Card.Header>
-            <Card.Body>
-              <Card.Title>Python</Card.Title>
-              <Card.Text>
-                Python Programming
-              </Card.Text>
-              <Button variant="primary">Go To Project</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
   )
 }
 

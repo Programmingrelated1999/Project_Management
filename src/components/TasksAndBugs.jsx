@@ -3,8 +3,6 @@ import "./TasksAndBugs.css"
 import ListItem from './TasksAndBugs/ListItem'
 import { Container } from 'react-bootstrap'
 
-import { Link } from 'react-router-dom'
-
 import { useSelector } from 'react-redux'
 
 const TasksAndBugs = () => {

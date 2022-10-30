@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { easeQuadInOut } from 'd3-ease';
 
 const ProgressBar = ({percentage}) => {
   return (
