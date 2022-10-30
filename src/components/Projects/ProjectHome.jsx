@@ -37,12 +37,12 @@ const ProjectHome = () => {
         <div>
             <h4 className = "project-detail-header">{currentProject.name}</h4>
             <h6 className = "project-detail-header">Description: {currentProject.description}</h6>
-            <span className='my-1'>Project Date Range: &nbsp;
+            <span className='my-1'><h6 className = "d-inline">Project Date Range: &nbsp; </h6>
                 <span className='text-success'>{moment(currentProject.createdDate).format("MMM-DD-YYYY")}</span> to &nbsp;
                 {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("MMM-DD-YYYY")}</span>:<span>N/A</span>}
             </span>
-            <h6>Project Deadline: <Chip label = {isDue? "Due": "Not Due"} size = "small"/></h6>
-            <h6>Project Status: <Chip label = {currentProject.status? "Complete": "Not Complete"} size = "small"/></h6>
+            {isDue? <h6>Project Deadline: <Chip color = "error" label = "Due" size = "small"/></h6> : <h6>Project Deadline: <Chip color = "success" label = "Not Due" size = "small"/></h6>}
+            {currentProject.status? <h6>Project Status: <Chip color = "error" label = "Complete" size = "small"/></h6> : <h6>Project Deadline: <Chip color = "success" label = "Not Complete" size = "small"/></h6>}
             <SideNavbar/>
         </div>
     )

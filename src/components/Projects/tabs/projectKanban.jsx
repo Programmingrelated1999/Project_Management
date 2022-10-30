@@ -5,6 +5,7 @@ import Column from '../Kanban/Column';
 import {editSelectedTask} from "../../../reducers/currentTaskReducer";
 import {editSelectedBug} from "../../../reducers/currentBugReducer";
 import { loadCurrentProjectData } from '../../../reducers/currentProjectReducer';
+import { loadCurrentUserData } from '../../../reducers/currentUserReducer';
 
 const projectKanban = () => {
 
@@ -63,6 +64,7 @@ const projectKanban = () => {
       }
       await editSelectedTask(id, data);
       await dispatch(loadCurrentProjectData(currentProjectId));
+      await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))))
     }
     if(type == 'Bug'){
       let data = {
@@ -70,6 +72,7 @@ const projectKanban = () => {
       }
       await editSelectedBug(id, data);
       await dispatch(loadCurrentProjectData(currentProjectId));
+      await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))))
     }
   }
 
@@ -87,6 +90,7 @@ const projectKanban = () => {
       }
       await editSelectedTask(id, data);
       await dispatch(loadCurrentProjectData(currentProjectId));
+      await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))))
     }
     if(type == 'Bug'){
       let data = {
@@ -95,6 +99,7 @@ const projectKanban = () => {
       console.log("Data", data);
       await editSelectedBug(id, data);
       await dispatch(loadCurrentProjectData(currentProjectId));
+      await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))))
     }
   }
 

@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { loadCurrentTaskData } from '../../../../reducers/currentTaskReducer'
 import { editSelectedTask } from '../../../../reducers/currentTaskReducer'
 import { loadCurrentProjectData } from '../../../../reducers/currentProjectReducer'
+import { loadCurrentUserData } from '../../../../reducers/currentUserReducer'
 
 const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
     const dispatch = useDispatch();
@@ -67,6 +68,7 @@ const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
         console.log()
         await editSelectedTask(id, data);
         await dispatch(loadCurrentProjectData(currentProject.id));
+        await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))))
         setNotification('');
         closeEdit();
     } 

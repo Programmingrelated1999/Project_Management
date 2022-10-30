@@ -18,7 +18,7 @@ import {
 //COMPONENTS
 //import Components
 import Projects from './Projects';
-import Tasks from './Tasks';
+import TasksAndBugs from './TasksAndBugs';
 import Home from "./Home";
 import ProjectHome from './Projects/ProjectHome';
 import CreateNewProject from './Projects/CreateNewProject';
@@ -45,7 +45,7 @@ const NavBar = ({logout, currentUser}) => {
           <div className = "mainNav">
             <Link to="/"><HomeIcon/> Home </Link>
             <Link to="/projects"><AccountTreeIcon /> Projects</Link>
-            <Link to="/tasks"><AssignmentIcon /> Tasks </Link>
+            <Link to="/tasks&bugs"><AssignmentIcon /> Tasks & Bugs </Link>
           </div>
           <div className = "profileNav">
             Welcome back!
@@ -55,7 +55,7 @@ const NavBar = ({logout, currentUser}) => {
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/projects/*" element={<Projects/>} />
-            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/tasks&bugs" element={<TasksAndBugs />} />
             <Route path="/projects/:id" element={<ProjectHome />} />
             <Route path="/projects/createNew" element = {<CreateNewProject />} />
           </Routes>
