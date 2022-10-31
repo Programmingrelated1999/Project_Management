@@ -26,7 +26,7 @@ const AppContainer = ({logout}) => {
   }
 
   return (
-    <div>
+    <div style={{minHeight: '100vh'}}>
         <NavBar logout = {logout} currentUser = {currentUser}/>
     </div>
   )

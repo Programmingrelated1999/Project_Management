@@ -19,6 +19,7 @@ const Home =  () => {
   const currentUserProjectInvites = useSelector(state => state.currentUser.personData.projectInvites)
   const currentUserTasks = useSelector(state => state.currentUser.personData.tasks)
   const currentUserBugs = useSelector(state => state.currentUser.personData.bugs)
+  const currentUserProjects = useSelector(state => state.currentUser.personData.projects);
   const isLoading = useSelector(state => state.currentUser.isLoading);
   const hasError = useSelector(state => state.currentUser.hasError);
   const userId = useSelector(state => state.currentUser.personData.id);
@@ -55,13 +56,16 @@ const Home =  () => {
         <div className = "home-main">   
           WELCOME BACK! {name}
         </div>
-        <div className = "d-flex justify-content-evenly">
-          <SampleProjects />
+        <div className = "d-flex" style={{justifyContent: "space-evenly"}}>
+          {currentUserProjects.length === 0 ? 
+            <div style={{ height: '12rem', width: '25rem', padding: '3rem', borderRadius: '1rem' }} className = "text-center invitations">
+                <h6 className = "text-danger">User Have No Projects</h6>
+            </div>: <SampleProjects />}
           {currentUserProjectInvites.length === 0 ? 
-            <div style={{ width: '18rem' }} className = "text-center invitations">
+            <div style={{height: '12rem', width: '25rem', padding: '3rem', borderRadius: '1rem' }} className = "text-center invitations">
                 <h6 className = "text-danger">User Have No Invitations</h6>
             </div>: 
-            <div style={{ height: '14rem', width: '22rem', overflow: "scroll" }}>
+            <div style={{ height: '14rem', width: '25rem', overflow: "scroll" }}>
               <h3>Invitations</h3>
               <Table striped bordered hover size="sm">
               <thead>

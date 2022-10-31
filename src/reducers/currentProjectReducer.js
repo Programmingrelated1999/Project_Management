@@ -49,6 +49,9 @@ const currentProjectSlice = createSlice({
     },
     deleteBug: (state, action) => {
       state.projectData.bugs = state.projectData.bugs.filter((bug) => bug.id !== action.payload.bug);
+    },
+    resetProject: (state, action) => {
+      state.projectData = {};
     }
   },
   extraReducers: {

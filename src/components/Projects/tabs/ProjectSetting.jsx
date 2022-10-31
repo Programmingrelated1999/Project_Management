@@ -15,6 +15,10 @@ import {IconButton, Tooltip} from '@mui/material'
 import { DatePicker } from '@mantine/dates'
 import ProjectServices from "../../../services/currentProjectServices"
 import moment from 'moment/moment'
+import DeleteProjectModal from "../Modals/DeleteProjectModal"
+import { deleteSelectedProject } from '../../../reducers/currentProjectReducer'
+import { loadCurrentUserData } from '../../../reducers/currentUserReducer'
+import { useNavigate } from 'react-router'
 
 import "./ProjectSetting.css";
 import ChangeUserRoleModal from '../Modals/ChangeUserRoleModal'
@@ -22,6 +26,7 @@ import ChangeUserRoleModal from '../Modals/ChangeUserRoleModal'
 const ProjectSetting = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   
   const currentProject = useSelector(state => state.currentProject.projectData);
   const isCurrentProjectLoading = useSelector(state => state.currentProject.isLoading);
@@ -38,14 +43,13 @@ const ProjectSetting = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showPromoteDemote, setShowPromoteDemote] = useState(false);
+  const [showProjectDelete, setShowProjectDelete] = useState(false);
   const [invites, setInvites] = useState([]);
   const [notification, setNotification] = useState('');
   const [userToKick, setUserToKick] = useState();
   const [userToChangeStatus, setUserToChangeStatus] = useState();
   const [newUserRole, setNewUserRole] = useState();
   const [endDate, setEndDate] = useState(new Date());
-
-  const momentCreatedDate = moment(currentProject.createdDate, 'YYYY-MM-DD');
 
   if(isCurrentProjectLoading || allUsersIsLoading){
     return <p>Loading</p>
@@ -73,6 +77,9 @@ const ProjectSetting = () => {
   const openDelete = () => {
     setShowDelete(true);
   }
+  const openProjectDelete = () => {
+    setShowProjectDelete(true);
+  }
   const closeDelete = () => {
     setShowDelete(false);
   }
@@ -81,6 +88,9 @@ const ProjectSetting = () => {
   }
   const closeUserChangeStatus = () => {
     setShowPromoteDemote(false);
+  }
+  const closeProjectDelete = () => {
+    setShowProjectDelete(false);
   }
   const addInvite = (invitedPerson) => {
     setInvites(invites.concat(invitedPerson));
@@ -147,12 +157,17 @@ const ProjectSetting = () => {
     }
   }
 
-  const handleProjectDelete = (event) => {
+  const handleProjectDelete = async (event) => {
     event.preventDefault();
-    
+    openProjectDelete();
   }
 
-  const due = ProjectServices.checkDueDate(currentProject.createdDate, endDate);
+  const deleteProject = async() => {
+    await deleteSelectedProject(currentProject.id);
+    await dispatch(loadCurrentUserData(JSON.parse(localStorage.getItem("id"))));
+    dispatch({ type: 'currentProject/resetProject'});
+    navigate("/projects");
+  }
 
   return (
     <div className = "d-flex flex-column align-items-center my-1">
@@ -247,6 +262,7 @@ const ProjectSetting = () => {
       </Card>
       {userToKick? <DeleteProjectMemberModal showDelete = {showDelete} closeDelete = {closeDelete} userToKick = {userToKick}/>: null}
       {userToChangeStatus? <ChangeUserRoleModal showPromoteDemote={showPromoteDemote} closeUserChangeStatus={closeUserChangeStatus} userToChangeStatus={userToChangeStatus} newUserRole={newUserRole}/>: null}
+      <DeleteProjectModal  showProjectDelete = {showProjectDelete} closeProjectDelete = {closeProjectDelete} deleteProject = {deleteProject}/>
     </div>
   )
 }

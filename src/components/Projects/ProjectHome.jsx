@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect} from 'react'
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
@@ -12,26 +12,26 @@ import moment from 'moment';
 import "./projectHome.css";
 
 const ProjectHome = () => {
-    const { id } = useParams();
-    const dispatch = useDispatch();
-
     //get Current Project
     const currentProject = useSelector(state => state.currentProject.projectData);
-    const isLoading = useSelector(state => state.currentProject.isLoading);
-    const hasError= useSelector(state => state.currentProject.hasError);
+    const isCurrentProjectLoading = useSelector(state => state.currentProject.isLoading);
+    const hasCurrentProjectError = useSelector(state => state.currentProject.hasError);
+
+    const dispatch = useDispatch();
+    const { id } = useParams();
 
     //useEffect
-    useEffect(() => {dispatch(loadCurrentProjectData(id))}, [id]);
+    useEffect(() => {    
+        dispatch(loadCurrentProjectData(id))}, [id]);
 
-    if(isLoading){
+    if(isCurrentProjectLoading || currentProject == null){
         return <p>Loading...</p>
     }
-
-    if(hasError){
+    if(hasCurrentProjectError){
         return <p>Has Error</p>
     }
 
-    const isDue = ProjectServices.checkDueDate(currentProject.createdDate, currentProject.endDate);
+    let isDue =  ProjectServices.checkDueDate(currentProject.createdDate, currentProject.endDate);
 
     return (
         <div>
@@ -42,7 +42,7 @@ const ProjectHome = () => {
                 {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("MMM-DD-YYYY")}</span>:<span>N/A</span>}
             </span>
             {isDue? <h6>Project Deadline: <Chip color = "error" label = "Due" size = "small"/></h6> : <h6>Project Deadline: <Chip color = "success" label = "Not Due" size = "small"/></h6>}
-            {currentProject.status? <h6>Project Status: <Chip color = "error" label = "Complete" size = "small"/></h6> : <h6>Project Deadline: <Chip color = "success" label = "Not Complete" size = "small"/></h6>}
+            {currentProject.status? <h6>Project Status: <Chip color = "error" label = "Complete" size = "small"/></h6> : <h6>Project Status: <Chip color = "success" label = "Not Complete" size = "small"/></h6>}
             <SideNavbar/>
         </div>
     )

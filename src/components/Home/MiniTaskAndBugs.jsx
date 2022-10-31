@@ -7,7 +7,11 @@ import { Link } from 'react-router-dom';
 const MiniTaskAndBugs = ({tasks, bugs}) => {
 
   if(tasks.length === 0){
-    return <p>No Tasks assigned</p>
+    return (
+    <div style={{ height: '12rem', width: '25rem', padding: '3rem', borderRadius: '1rem'}} className = "text-center invitations">
+      <h6 className = "text-danger">User Have No Projects</h6>
+    </div>
+    )
   }
 
   return (
