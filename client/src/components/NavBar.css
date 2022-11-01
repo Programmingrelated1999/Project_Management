@@ -1,0 +1,30 @@
+.navBar{
+    display: flex;
+    justify-content: space-between;
+    background-color: #f1eeee;
+    align-items: center;
+    flex-wrap: wrap;
+}
+  
+.mainNav, .logo{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.mainNav a{
+    color: black;
+    font-size: 1.2rem;
+    text-decoration: none;
+    margin: 0 1.6rem;
+}
+  
+.profileNav{
+    display: flex;
+    align-items: center;
+}
+
+.logo{
+  text-decoration: none;
+  color: black
+}

@@ -1,0 +1,21 @@
+.clock-background{
+    background-color: rgb(253, 255, 239);
+    width: 25rem;
+    height: 12rem;
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.clock-display{
+    display: flex;
+    flex-direction: column;
+}
+
+.time{
+    margin: 1rem;
+    display: block;
+}

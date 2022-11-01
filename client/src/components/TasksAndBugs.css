@@ -1,0 +1,30 @@
+.tasksAndBugs h3{
+    text-align: center;
+    margin: 1rem;
+}
+
+.user-tasks-bugs-status{
+    background-color: rgb(231, 231, 231);
+    border-radius: 1rem;
+    color: black;
+    font-size: 1.2rem;
+    padding: 1rem 4rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.progress-num{
+    background-color: black;
+    padding: 0 0.6rem;
+    color: white
+}
+
+.task-bug-not-started{
+    background-color: rgb(255, 185, 185);
+}
+.task-bug-progress{
+    background-color: rgb(245, 253, 188);
+}
+.task-bug-done{
+    background-color: rgb(162, 255, 198);
+}

@@ -1,0 +1,32 @@
+.home-main{
+    display: flex;
+    justify-content: center;
+    margin: 2rem;
+    font-size: 2rem;
+    color:  orangered
+  }
+  
+.home-main button{
+    margin: 1rem;
+}
+
+.calendarAndTask{
+    display: flex;
+    justify-content: space-evenly;
+    margin: 3rem;
+}
+
+.miniTask{
+    width: 25rem;
+    height: 25rem;
+    border: 0.1rem solid black;
+    border-radius: 1rem;
+}
+
+.invitations{
+    background-color: rgb(254, 255, 243);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}

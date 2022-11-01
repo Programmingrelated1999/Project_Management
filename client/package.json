@@ -1,0 +1,48 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mantine/core": "^5.5.4",
+    "@mantine/dates": "^5.5.4",
+    "@mantine/hooks": "^5.5.4",
+    "@mui/icons-material": "^5.10.3",
+    "@mui/material": "^5.10.5",
+    "@mui/x-date-pickers": "^5.0.5",
+    "@reduxjs/toolkit": "^1.8.5",
+    "@syncfusion/ej2-react-schedule": "^20.2.45",
+    "axios": "^0.27.2",
+    "bootstrap": "^5.2.1",
+    "chart.js": "^3.9.1",
+    "d3-ease": "^3.0.1",
+    "dayjs": "^1.11.5",
+    "moment": "^2.29.4",
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-bootstrap": "^2.5.0",
+    "react-calendar": "^3.9.0",
+    "react-chartjs-2": "^4.3.1",
+    "react-circle-progress-bar": "^0.1.4",
+    "react-circular-progressbar": "^2.1.0",
+    "react-dom": "^18.2.0",
+    "react-google-calendar-api": "^2.1.0",
+    "react-redux": "^8.0.4",
+    "react-router": "^6.4.0",
+    "react-router-dom": "^6.4.1",
+    "redux": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.1.0",
+    "vite": "^3.1.0"
+  }
+}

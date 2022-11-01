@@ -1,0 +1,34 @@
+.dashboard{
+    display: flex;
+    justify-content: space-around;
+    margin: 2rem;
+}
+
+.project-dashboard-progress{
+    width: 30rem;
+    height: 30rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.progress-bar{
+    margin: auto;
+}
+
+.pie-charts{
+    width: 22rem;
+    height: 25rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.no-item-reminder{
+    text-align: center;
+}
+
+#total-members-text{
+    font-size: 1.6rem;
+    font-weight: bold;
+}
