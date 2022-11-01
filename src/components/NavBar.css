@@ -3,6 +3,7 @@
     justify-content: space-between;
     background-color: #f1eeee;
     align-items: center;
+    flex-wrap: wrap;
 }
   
 .mainNav, .logo{

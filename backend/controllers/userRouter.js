@@ -39,13 +39,20 @@ userRouter.get("/:id", async (request, response) => {
 userRouter.post("/", async (request, response) => {
     //bcrypt setup, with salt rounds 10 and create a password hash
     const saltRounds = 10;
+    if(!request.body.password){
+      response.status(403).json("error password")
+    }
     const passwordHash = await bcrypt.hash(request.body.password, saltRounds);
 
     //a new user model with name, username, and passwordHash
     const user = new Users({name: request.body.name, username: request.body.username, passwordHash: passwordHash});
-
-    //save the user. 
-    const savedUser = await user.save();
+    let savedUser;
+    try{
+      //save the user. 
+      savedUser = await user.save();
+    } catch(error){
+      response.status(403).json(error);
+    }
     response.json(savedUser);
 });
 

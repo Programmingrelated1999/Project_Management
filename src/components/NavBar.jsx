@@ -51,7 +51,7 @@ const NavBar = ({logout, currentUser}) => {
           </div>
           <div className = "profileNav">
             <Dropdown>
-              <Dropdown.Toggle variant="success" id="dropdown-button-dark-example1" size = "sm">
+              <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1" size = "sm">
                 {currentUser.name}
               </Dropdown.Toggle>
 

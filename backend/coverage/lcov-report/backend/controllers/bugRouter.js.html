@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.14% </span>
+                <span class="strong">80.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>86/101</span>
+                <span class='fraction'>87/108</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60.71% </span>
+                <span class="strong">60.34% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>34/56</span>
+                <span class='fraction'>35/58</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.31% </span>
+                <span class="strong">81.37% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>82/95</span>
+                <span class='fraction'>83/102</span>
             </div>
         
             
@@ -255,7 +255,22 @@
 <a name='L190'></a><a href='#L190'>190</a>
 <a name='L191'></a><a href='#L191'>191</a>
 <a name='L192'></a><a href='#L192'>192</a>
-<a name='L193'></a><a href='#L193'>193</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -277,8 +292,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -319,11 +334,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -504,18 +534,33 @@ bugRouter.post("/", async (request, response) =&gt; {
 &nbsp;
     //if user is owner or admin, allow create bug.
     if(isUserCreator || isUserAdmin){
-        const bug = new Bugs({
+        let bug = new Bugs({
             name: request.body.name,
-            createdDate: Date.now(),
+            createdDate: new Date().toDateString(),
             description: request.body.description,
-            project: project._id,
+            project: project.id,
         });
+&nbsp;
+        let assignedList;
+&nbsp;
+        //if there are any users invited from the project, then saved the list of users in the invite list.
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(request.body.assigned){
+<span class="cstat-no" title="statement not covered" >            bug.assigned = request.body.assigned;</span>
+<span class="cstat-no" title="statement not covered" >            assignedList = request.body.assigned;</span>
+        }
     
         const savedBug = await bug.save();
         project.bugs = project.bugs.concat(savedBug._id);
         await project.save();
+&nbsp;
+        //save the project to the invited user's project invites list.
+        for(let user of assignedList){
+            let assignedUser = <span class="cstat-no" title="statement not covered" >await Users.findById(user);</span>
+<span class="cstat-no" title="statement not covered" >            assignedUser.bugs = assignedUser.bugs.concat(savedBug._id);</span>
+<span class="cstat-no" title="statement not covered" >            await assignedUser.save();</span>
+        }
     
-        response.json(savedBug);
+<span class="cstat-no" title="statement not covered" >        response.json(savedBug);</span>
     } else<span class="missing-if-branch" title="else path not taken" >E</span>{
         //else return user is not authorized to create bug.
 <span class="cstat-no" title="statement not covered" >        response.status(401).json({error: 'user is not authorized to create bug'});</span>
@@ -623,7 +668,7 @@ bugRouter.delete("/:id", async (request, response) =&gt; {
         )
         await project.save();
 &nbsp;
-        const userList = bugToDelete.assigned.map((user) =&gt; user.id);
+        const userList = bugToDelete.assigned.map((user) =&gt; user);
         for (let user of userList){
             const userToUpdate = await Users.findById(user);
             userToUpdate.bugs = userToUpdate.bugs.filter((bug) =&gt; bug != bugToDelete.id);
@@ -646,7 +691,7 @@ module.exports = bugRouter;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-10-15T02:52:09.917Z
+                at 2022-11-01T19:17:23.611Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

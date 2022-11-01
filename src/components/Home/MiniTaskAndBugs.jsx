@@ -31,7 +31,7 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
               <td>{task.name}</td>
               <td>{task.endDate? task.endDate: "N/A"}</td>
               <td><Chip label = "Task" color = "warning" size = "small"/></td>
-              <td><Link to = {`projects/${String(task.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
+              <td><Link to = {`projects/${String(task.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Project <LaunchIcon/></Button></Link></td>
             </tr>)
           }
           {bugs.map((bug) =>     
@@ -39,7 +39,7 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
               <td>{bug.name}</td>
               <td>{bug.endDate? bug.endDate: "N/A"}</td>
               <td><Chip label = "Bug" color = "success" size = "small"/></td>
-              <td><Link to = {`projects/${String(bug.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
+              <td><Link to = {`projects/${String(bug.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Project <LaunchIcon/></Button></Link></td>
             </tr>)
           }
         </tbody>
