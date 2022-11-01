@@ -55,16 +55,31 @@ bugRouter.post("/", async (request, response) => {
 
     //if user is owner or admin, allow create bug.
     if(isUserCreator || isUserAdmin){
-        const bug = new Bugs({
+        let bug = new Bugs({
             name: request.body.name,
             createdDate: new Date().toDateString(),
             description: request.body.description,
-            project: project._id,
+            project: project.id,
         });
+
+        let assignedList;
+
+        //if there are any users invited from the project, then saved the list of users in the invite list.
+        if(request.body.assigned){
+            bug.assigned = request.body.assigned;
+            assignedList = request.body.assigned;
+        }
     
         const savedBug = await bug.save();
         project.bugs = project.bugs.concat(savedBug._id);
         await project.save();
+
+        //save the project to the invited user's project invites list.
+        for(let user of assignedList){
+            let assignedUser = await Users.findById(user);
+            assignedUser.bugs = assignedUser.bugs.concat(savedBug._id);
+            await assignedUser.save();
+        }
     
         response.json(savedBug);
     } else{

@@ -28,8 +28,8 @@ userRouter.get("/", async (request, response, next) => {
 //GET ONE
 userRouter.get("/:id", async (request, response) => {
   const userToReturn = await Users.findById(request.params.id).populate('projectInvites', {name: 1, description: 1})
-  .populate({path: 'tasks', populate: { path: 'project', select: ['name']}})
-  .populate({path: 'bugs', populate: { path: 'project', select: ['name']}})
+  .populate('tasks', {name: 1, description: 1, createdDate: 1, endDate: 1, project: 1, status: 1})
+  .populate('bugs', {name: 1, description: 1, createdDate: 1, endDate: 1, project: 1, status: 1})
   .populate('projects', {name: 1, description: 1, createdDate: 1, endDate: 1});
   response.json(userToReturn)
 })

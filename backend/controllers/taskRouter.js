@@ -59,7 +59,7 @@ taskRouter.post("/", async (request, response) => {
             name: request.body.name,
             createdDate: new Date().toDateString(),
             description: request.body.description,
-            project: project._id,
+            project: project.id,
         });
 
         let assignedList;

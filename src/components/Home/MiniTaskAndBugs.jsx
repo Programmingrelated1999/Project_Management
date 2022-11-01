@@ -29,17 +29,17 @@ const MiniTaskAndBugs = ({tasks, bugs}) => {
           {tasks.map((task) =>     
             <tr key = {task.id}>
               <td>{task.name}</td>
-              <td>{task.project.name}</td>
+              <td>{task.endDate? task.endDate: "N/A"}</td>
               <td><Chip label = "Task" color = "warning" size = "small"/></td>
-              <td><Link to = {`projects/${task.project.id}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
+              <td><Link to = {`projects/${String(task.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
             </tr>)
           }
           {bugs.map((bug) =>     
             <tr key = {bug.id}>
               <td>{bug.name}</td>
-              <td>{bug.project.name}</td>
+              <td>{bug.endDate? bug.endDate: "N/A"}</td>
               <td><Chip label = "Bug" color = "success" size = "small"/></td>
-              <td><Link to = {`projects/${bug.project.id}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
+              <td><Link to = {`projects/${String(bug.project)}`}><Button className = "btn btn-warning" size = "sm  ">Jump To Kanban <LaunchIcon/></Button></Link></td>
             </tr>)
           }
         </tbody>
