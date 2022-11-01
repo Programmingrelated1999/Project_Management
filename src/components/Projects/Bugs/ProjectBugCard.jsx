@@ -7,7 +7,7 @@ import "./ProjectBugCard.css"
 const ProjectBugCard = ({name, description, createdDate, openDelete, openViewDetails, openEdit}) => {
   return (
     <div>
-        <Card style={{ width: '18.5rem' }}>
+        <Card style={{ width: '18.5rem' }} className = "mx-4 my-2">
             <Card.Body>
                 <Card.Title>{name}</Card.Title>
                 <Chip label = {`Created on ${createdDate}`} color="primary" size="small" />

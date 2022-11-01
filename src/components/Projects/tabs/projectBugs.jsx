@@ -14,6 +14,8 @@ import { Container, Button } from 'react-bootstrap';
 import { deleteSelectedBug } from '../../../reducers/currentBugReducer';
 import CreateANewBugModal from "../Bugs/Modals/CreateANewBugModal"
 
+import "./projectBug.css"
+
 const ProjectBugs = () => {
   const bugs = useSelector(state => state.currentProject.projectData.bugs);
   const isLoading = useSelector(state => state.currentProject.isLoading);
@@ -114,11 +116,11 @@ const ProjectBugs = () => {
         <Button className = "btn btn-warning" onClick = {openCreateBug}>Create New Bug</Button>
       </Container>
       <p>Started</p>
-        {started.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}
+        <div className='bug-card-container'>{started.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}</div>
       <p>Progress</p>
-        {progress.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)} />)}  
+        <div className='bug-card-container'>{progress.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = { () => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)} />)}</div> 
       <p>Done</p>
-        {done.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = {( ) => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}
+        <div className='bug-card-container'>{done.map((bug) => <ProjectBugCard key = {bug.id} name = {bug.name} description = {bug.description} createdDate = {bug.createdDate} bugId = {bug.id} openDelete = {() => openDelete(bug.id)} openViewDetails = {( ) => openViewDetails(bug.id)} openEdit = {() => openEdit(bug.id)}/>)}</div>
       
       {bugSelected? <ViewBugModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} bugSelected={bugSelected}/>: null}
       {bugSelected? <EditBugModal showEdit={showEdit} closeEdit = {closeEdit} bugSelected={bugSelected}/> : null}

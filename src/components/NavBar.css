@@ -1,28 +1,29 @@
 .navBar{
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    display: flex;
+    justify-content: space-between;
     background-color: #f1eeee;
-  }
-  
-  .mainNav{
-    display:flex;
-    justify-content: space-evenly;
     align-items: center;
-  }
+}
   
-  .mainNav a{
+.mainNav, .logo{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.mainNav a{
     color: black;
     font-size: 1.2rem;
     text-decoration: none;
-  }
+    margin: 0 1.6rem;
+}
   
-  .profileNav{
-    text-align: right;
-    margin: auto 0;
-  }
-  
-  .profileNav a{
-    border: 0.1rem solid black;
-    padding: 0.5rem;
-    border-radius: 50%;
-  }
+.profileNav{
+    display: flex;
+    align-items: center;
+}
+
+.logo{
+  text-decoration: none;
+  color: black
+}

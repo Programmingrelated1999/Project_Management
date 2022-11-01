@@ -14,6 +14,8 @@ import { Container, Button } from 'react-bootstrap';
 import { deleteSelectedTask } from '../../../reducers/currentTaskReducer';
 import CreateANewTaskModal from '../Tasks/Modals/CreateANewTaskModal';
 
+import "./ProjectTasks.css"
+
 const ProjectTasks = () => {
   const tasks = useSelector(state => state.currentProject.projectData.tasks);
   const isLoading = useSelector(state => state.currentProject.isLoading);
@@ -114,11 +116,11 @@ const ProjectTasks = () => {
         <Button className = "btn btn-warning" onClick = {openCreateTask}>Create New Task</Button>
       </Container>
       <p>Started</p>
-        {started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}
+        <div className = "task-card-container">{started.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}</div>
       <p>Progress</p>
-        {progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)} />)}  
+        <div className="task-card-container">{progress.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = { () => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)} />)}</div>
       <p>Done</p>
-        {done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}
+        <div className="task-card-container">{done.map((task) => <ProjectTaskCard key = {task.id} name = {task.name} description = {task.description} createdDate = {task.createdDate} taskId = {task.id} openDelete = {() => openDelete(task.id)} openViewDetails = {( ) => openViewDetails(task.id)} openEdit = {() => openEdit(task.id)}/>)}</div>
       
       {taskSelected? <ViewTaskModal showViewDetails={showViewDetails} closeViewDetails = {closeViewDetails} taskSelected={taskSelected}/>: null}
       {taskSelected? <EditTaskModal showEdit={showEdit} closeEdit = {closeEdit} taskSelected={taskSelected}/> : null}

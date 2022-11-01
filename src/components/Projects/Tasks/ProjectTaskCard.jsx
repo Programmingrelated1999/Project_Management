@@ -6,20 +6,18 @@ import "./ProjectTaskCard.css"
 
 const ProjectTaskCard = ({name, description, createdDate, openDelete, openViewDetails, openEdit}) => {
   return (
-    <div>
-        <Card style={{ width: '18.5rem' }}>
+        <Card style={{ width: '18.5rem' }} className = "mx-4 my-2">
             <Card.Body>
                 <Card.Title>{name}</Card.Title>
                 <Chip label = {`Created on ${createdDate}`} color="primary" size="small" />
                 <Card.Text>
                     {description}
                 </Card.Text>
-                <Button href="#" className = "project-task-card"  onClick = {openViewDetails}>View Details</Button>
-                <Button href="#" className = "project-task-card" onClick = {openEdit}>Edit</Button>
-                <Button href="#" color = "error" className = "project-task-card" onClick = {openDelete}>Delete</Button>
+                <Button className = "project-task-card"  onClick = {openViewDetails}>View Details</Button>
+                <Button className = "project-task-card" onClick = {openEdit}>Edit</Button>
+                <Button className = "project-task-card" color = "error" onClick = {openDelete}>Delete</Button>
             </Card.Body>
         </Card>
-    </div>
   )
 }
 
