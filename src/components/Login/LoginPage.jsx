@@ -1,6 +1,7 @@
     import React, {useState} from 'react';
 
     import loginService from './services/loginService';
+    import LoginPic from "../../images/receptionist-receiving-visitor-at-desk.jpg"
 
     import { Button } from 'react-bootstrap';
 
@@ -111,7 +112,7 @@
             <div className = "login-page">
                 <div className = "login-container">
                     <div className = "login-picture">
-                        <img src = ".../../../public/images/receptionist-receiving-visitor-at-desk.jpg"/>
+                        <img src = {LoginPic}/>
                     </div>
                     {createNewAccount? 
                     <div className="login">
