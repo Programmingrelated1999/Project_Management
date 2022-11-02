@@ -2,7 +2,8 @@
 import axios from "axios";
 
 //form and question base url
-const baseUrl = "http://localhost:3001/api/users";
+//const baseUrl = "http://localhost:3001/api/users";
+const baseUrl = "'https://floating-everglades-17588.herokuapp.com/api/users"
 
 //getAll
 const getUser = async (userId) => {

@@ -1,11 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
+//dev url
+//const usersUrl = 'http://localhost:3001/api/users/';
+
+//production url
+const usersUrl = 'https://floating-everglades-17588.herokuapp.com/api/users/'
+
 // Create loadCurrentUserData here.
 export const loadCurrentUserData = createAsyncThunk(
   'currentUser/loadCurrentUserData',
   async(id, thunkAPI) => {
-    const response = await axios.get(`http://localhost:3001/api/users/${id}`);
+    const response = await axios.get(`${usersUrl}${id}`);
     console.log("response", response);
     return response.data;
   }
@@ -15,7 +21,7 @@ export const loadCurrentUserData = createAsyncThunk(
 export const acceptInvite = createAsyncThunk(
   'currentUser/acceptInvite',
   async({userId, projectId}, thunkAPI) => {
-    const response = await axios.put(`http://localhost:3001/api/users/${userId}`, {acceptInvite: projectId});
+    const response = await axios.put(`${usersUrl}${userId}`, {acceptInvite: projectId});
     return response.data;
   }
 )
@@ -24,7 +30,7 @@ export const acceptInvite = createAsyncThunk(
 export const rejectInvite = createAsyncThunk(
   'currentUser/rejectInvite',
   async({userId, projectId}, thunkAPI) => {
-    const response = await axios.put(`http://localhost:3001/api/users/${userId}`, {rejectInvite: projectId});
+    const response = await axios.put(`${usersUrl}${userId}`, {rejectInvite: projectId});
     return response.data;
   }
 )

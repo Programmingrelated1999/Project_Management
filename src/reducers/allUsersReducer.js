@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
+//dev users url
+//const usersUrl = `http://localhost:3001/api/users`;
+const usersUrl = "https://floating-everglades-17588.herokuapp.com/api/users";
+
 // Create loadCurrentUserData here.
 export const loadAllUsersData = createAsyncThunk(
   'currentBug/loadAllUsersData',
   async(id, thunkAPI) => {
-    const response = await axios.get(`http://localhost:3001/api/users`);
+    const response = await axios.get(usersUrl);
     return response.data;
   }
 )

@@ -1,11 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
+//dev url
+//const projectsUrl = 'http://localhost:3001/api/projects/';
+
+//production url
+const projectsUrl = 'https://floating-everglades-17588.herokuapp.com/api/projects/'
+
+
 // Create loadCurrentUserData here.
 export const loadCurrentProjectData = createAsyncThunk(
   'currentProject/loadCurrentProjectData',
   async(id, thunkAPI) => {
-    const response = await axios.get(`http://localhost:3001/api/projects/${id}`);
+    const response = await axios.get(`${projectsUrl}${id}`);
     return response.data;
   }
 )
@@ -13,25 +20,25 @@ export const loadCurrentProjectData = createAsyncThunk(
 //create a new project
 export const createANewProject = async(projectData) => {
   const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-  const response = await axios.post(`http://localhost:3001/api/projects`, projectData, {headers: {Authorization: token}});
+  const response = await axios.post(projectsUrl, projectData, {headers: {Authorization: token}});
   return response.data;
 }
 
 export const editSelectedProject = async(id, data) => {
   const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-  const response = await axios.put(`http://localhost:3001/api/projects/${id}`, data, {headers: {Authorization: token}});
+  const response = await axios.put(`${projectsUrl}${id}`, data, {headers: {Authorization: token}});
   return response.data;
 }
 
 export const changeUserRoleInProject = async(id, userId, data) => {
   const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-  const response = await axios.put(`http://localhost:3001/api/projects/${id}/${userId}`, data, {headers: {Authorization: token}});
+  const response = await axios.put(`${projectsUrl}${id}/${userId}`, data, {headers: {Authorization: token}});
   return response.data;
 }
 
 export const deleteSelectedProject = async(projectId) => {
   const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-  const response = await axios.delete(`http://localhost:3001/api/projects/${projectId}`, {headers: {Authorization: token}});
+  const response = await axios.delete(`${projectsUrl}${projectId}`, {headers: {Authorization: token}});
   return response.data;
 }
 

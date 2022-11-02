@@ -1,31 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
+//dev url
+//const bugsUrl = 'http://localhost:3001/api/bugs/';
+
+//production url
+const bugsUrl = 'https://floating-everglades-17588.herokuapp.com/api/bugs/'
+
 // Create loadCurrentUserData here.
 export const loadCurrentBugData = createAsyncThunk(
   'currentBug/loadCurrentBugData',
   async(id, thunkAPI) => {
     console.log("id", id);
-    const response = await axios.get(`http://localhost:3001/api/bugs/${id}`);
+    const response = await axios.get(`${bugsUrl}${id}`);
     return response.data;
   }
 )
 
 export const deleteSelectedBug = async(id) => {
     const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-    const response = await axios.delete(`http://localhost:3001/api/bugs/${id}`, {headers: {Authorization: token}});
+    const response = await axios.delete(`${bugsUrl}${id}`, {headers: {Authorization: token}});
     return response.data;
 }
 
 export const createBug = async(data) => {
     const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-    const response = await axios.post(`http://localhost:3001/api/bugs`, data, {headers: {Authorization: token}});
+    const response = await axios.post(bugsUrl, data, {headers: {Authorization: token}});
     return response.data;
 }
 
 export const editSelectedBug = async(id, data) => {
   const token = `bearer ${JSON.parse(localStorage.getItem("token")).token}`;
-  const response = await axios.put(`http://localhost:3001/api/bugs/${id}`, data, {headers: {Authorization: token}});
+  const response = await axios.put(`${bugsUrl}${id}`, data, {headers: {Authorization: token}});
   return response.data;
 }
 
