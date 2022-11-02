@@ -8,6 +8,10 @@ const loginRouter = require('express').Router()
 //import Users model
 const Users = require('../models/users')
 
+loginRouter.get("/", async(request, response) => {
+  response.json({error: "hello"});
+})
+
 //loginRouter will have POST Method
 loginRouter.post('/', async (request, response) => {
   //request body will contain username and password
