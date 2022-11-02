@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import "./projectMembers.css"
+import "./ProjectMembers.css"
 
 const ProjectMembers = () => {
   const creator = useSelector(state => state.currentProject.projectData.creator);

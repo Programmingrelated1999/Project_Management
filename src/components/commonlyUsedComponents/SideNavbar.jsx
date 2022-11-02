@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import Nav from 'react-bootstrap/Nav';
 import ProjectDashboard from "../Projects/tabs/ProjectDashboard"
 import ProjectMembers from '../Projects/tabs/ProjectMembers';
-import ProjectKanban from '../Projects/tabs/projectKanban';
-import ProjectTasks from '../Projects/tabs/projectTasks';
-import ProjectBugs from '../Projects/tabs/projectBugs';
+import ProjectKanban from '../Projects/tabs/ProjectKanban';
+import ProjectTasks from '../Projects/tabs/ProjectTasks';
+import ProjectBugs from '../Projects/tabs/ProjectBugs';
 import ProjectSetting from "../Projects/tabs/ProjectSetting";
 
 const SideNavbar = () => {

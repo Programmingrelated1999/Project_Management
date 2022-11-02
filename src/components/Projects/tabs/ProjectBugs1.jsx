@@ -14,7 +14,7 @@ import { Container, Button } from 'react-bootstrap';
 import { deleteSelectedBug } from '../../../reducers/currentBugReducer';
 import CreateANewBugModal from "../Bugs/Modals/CreateANewBugModal"
 
-import "./ProjectBug.css"
+import "./ProjectBugs.css"
 
 const ProjectBugs = () => {
   const bugs = useSelector(state => state.currentProject.projectData.bugs);
