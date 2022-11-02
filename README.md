@@ -74,9 +74,8 @@ $ npm run dev
 ### Work in Progress
 There are a few things that need to be developed further more. The application is still under progress and is not fully complete. 
 
-1) You will see that the status of the project does not change. (Working)
-2) The tasks and bugs do not have endDate input for the user yet, therefore all tasks and bugs will show N/A end date.(Working)
-3) Roles does not work fully yet. In future updates, only admins and owner can delete the tasks and bugs. 
-4) User profile will be added soon and members will be displayed in profile cards rather than listing. 
+1) The tasks and bugs do not have endDate input for the user yet, therefore all tasks and bugs will show N/A end date.(Working)
+2) Roles does not work fully yet. In future updates, only admins and owner can delete the tasks and bugs. 
+3) User profile will be added soon and members will be displayed in profile cards rather than listing. 
 
 
