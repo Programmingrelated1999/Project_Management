@@ -4,7 +4,7 @@ import ProjectDashboard from "../Projects/tabs/ProjectDashboard"
 import ProjectMembers from '../Projects/tabs/ProjectMembers';
 import ProjectKanban from '../Projects/tabs/projectKanban';
 import ProjectTasks from '../Projects/tabs/projectTasks';
-import ProjectBugs from "../Projects/tabs/ProjectBugs";
+import ProjectBugs from '../Projects/tabs/projectBugs';
 import ProjectSetting from "../Projects/tabs/ProjectSetting";
 
 const SideNavbar = () => {
