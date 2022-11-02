@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 //port and mongodb uri are
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 
 //Mongodb uri
 const MONGODB_URI = process.env.NODE_ENV === 'test' 
