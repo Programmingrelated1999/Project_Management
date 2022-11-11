@@ -9,6 +9,10 @@ import { loadCurrentTaskData } from '../../../../reducers/currentTaskReducer'
 import { editSelectedTask } from '../../../../reducers/currentTaskReducer'
 import { loadCurrentProjectData } from '../../../../reducers/currentProjectReducer'
 import { loadCurrentUserData } from '../../../../reducers/currentUserReducer'
+import { Calendar } from '@mantine/dates'
+
+import dayjs from 'dayjs'
+import moment from 'moment'
 
 const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
     const dispatch = useDispatch();
@@ -24,6 +28,7 @@ const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
     const status = useRef();
     const selectedUser = useRef();
     const [notification, setNotification] = useState('');
+    const [endDate, setEndDate] = useState();
 
     //useEffect
     useEffect(() => {
@@ -63,6 +68,9 @@ const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
             description: description.current.value,
             status: status.current.value,
             assigned,
+        }
+        if(endDate){
+            data.endDate = endDate
         }
         const id = currentTask.id
         console.log()
@@ -144,6 +152,15 @@ const EditTaskModal = ({showEdit, closeEdit, taskSelected}) => {
                         {allMembers.map((member) => <option key = {member.id} value = {member.id}>{member.username}</option>)}
                     </select>
                 </Form.Group>
+
+                <p className = "text text-dark">Set End Date</p>
+                <p className = "text text-dark">Current Task DeadLine: <span className = "text text-danger">{currentTask.endDate? moment(currentTask.endDate).format("MMM-DD-YYYY"): "N/A"}</span></p>
+                <Calendar
+                    value={endDate}
+                    onChange={(value) => setEndDate(value)}
+                    minDate={new Date()}
+                    maxDate = {dayjs(currentProject.endDate).toDate()}
+                />
 
                 <div>
                 <Button variant="success" type="submit" className='buttons-vertical' onClick = {handleAssignAdd}>Add User</Button>

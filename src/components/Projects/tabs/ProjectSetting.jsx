@@ -157,6 +157,16 @@ const ProjectSetting = () => {
     }
   }
 
+  const markAsComplete = async (event) => {
+    event.preventDefault();
+    const data = {
+      status: true,
+    }
+    const id = currentProject.id;
+    await editSelectedProject(id, data);
+    await dispatch(loadCurrentProjectData(id));
+  }
+
   const handleProjectDelete = async (event) => {
     event.preventDefault();
     openProjectDelete();
@@ -169,8 +179,18 @@ const ProjectSetting = () => {
     navigate("/projects");
   }
 
+    //for displaying dashboard stats
+    const taskDone = currentProject.tasks.reduce( (count, task) => task.status === 'Done'? count + 1 : count, 0)
+    const bugDone = currentProject.bugs.reduce( (count, bug) => bug.status === 'Done'? count + 1 : count, 0)
+  
+    let projectProgress = Math.round(((taskDone+bugDone)/(currentProject.tasks.length + currentProject.bugs.length)) * 100)
+    if(!projectProgress){
+      projectProgress = 0;
+    }
+
   return (
     <div className = "d-flex flex-column align-items-center my-1">
+      {projectProgress === 100? <div className = "my-3 d-flex align-items-end"><h4 className='text text-success'>Project Progress is 100%</h4><Button onClick = {markAsComplete} className = "btn btn-success mx-2">Mark Project As Complete</Button></div>: null}
       {isUserCreator? <Button className = "my-3 btn btn-danger" onClick = {handleProjectDelete}>Delete This Project</Button>: null}
       <Card className = 'px-5'>
       <Form onSubmit = {handleSubmit} className = "d-flex flex-column align-items-center">

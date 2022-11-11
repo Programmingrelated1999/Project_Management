@@ -9,6 +9,9 @@ import { loadCurrentUserData } from '../../../../reducers/currentUserReducer';
 import TextField from '@mui/material/TextField';
 import { Chip } from '@mui/material';
 import { Textarea } from '@mantine/core';
+import { Calendar } from '@mantine/dates';
+
+import dayjs from 'dayjs';
 
 import "./CreateANewTaskModal.css";
 
@@ -39,6 +42,7 @@ const CreateANewTaskModal = ({showCreateTask, closeCreateTask}) => {
   const [selectedUser, setSelectedUser] = useState();
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [showAssignedUsers, setShowAssignedUsers] = useState([]);
+  const [endDate, setEndDate] = useState();
 
   const handleSelectedUser = (event) => {
     event.preventDefault();
@@ -124,6 +128,13 @@ const CreateANewTaskModal = ({showCreateTask, closeCreateTask}) => {
                 {allMembers.map((member) => <option key = {member.id} value = {member.id}>{member.username}</option>)}
               </select>
               <Button className ="d-block m-2 btn btn-success" onClick = {handleAssignedUsers}> Assigned Selected User </Button>
+              <p className = "text text-dark">Select End Date</p>
+              <Calendar
+                value={endDate}
+                onChange={(value) => setEndDate(value)}
+                minDate={new Date()}
+                maxDate = {dayjs(currentProject.endDate).toDate()}
+              />
               <div>
                 {
                   showAssignedUsers.map(user => <Chip label={user.name} key = {user.id} onDelete={() => handleAssignedUsersDelete(user.id)} className = "showAssignedUsers"/>)

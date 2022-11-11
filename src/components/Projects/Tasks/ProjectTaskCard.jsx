@@ -6,12 +6,13 @@ import moment from "moment"
 
 import "./ProjectTaskCard.css"
 
-const ProjectTaskCard = ({name, description, createdDate, openDelete, openViewDetails, openEdit}) => {
+const ProjectTaskCard = ({name, description, createdDate, endDate, openDelete, openViewDetails, openEdit}) => {
   return (
         <Card style={{ width: '18.5rem' }} className = "mx-4 my-2">
             <Card.Body>
                 <Card.Title>{name}</Card.Title>
                 <Chip label = {`Created on ${moment(createdDate).format("MMM-DD-YYYY")}`} color="primary" size="small" />
+                <Chip label = {endDate? `End on ${moment(endDate).format("MMM-DD-YYYY")}`: 'N/A'} color="error" size="small" />
                 <Card.Text>
                     {description}
                 </Card.Text>
