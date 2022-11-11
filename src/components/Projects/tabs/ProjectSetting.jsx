@@ -190,7 +190,7 @@ const ProjectSetting = () => {
 
   return (
     <div className = "d-flex flex-column align-items-center my-1">
-      {projectProgress === 100? <div className = "my-3 d-flex align-items-end"><h4 className='text text-success'>Project Progress is 100%</h4><Button onClick = {markAsComplete} className = "btn btn-success mx-2">Mark Project As Complete</Button></div>: null}
+      {projectProgress === 100 && !currentProject.status? <div className = "my-3 d-flex align-items-end"><h4 className='text text-success'>Project Progress is 100%</h4><Button onClick = {markAsComplete} className = "btn btn-success mx-2">Mark Project As Complete</Button></div>: null}
       {isUserCreator? <Button className = "my-3 btn btn-danger" onClick = {handleProjectDelete}>Delete This Project</Button>: null}
       <Card className = 'px-5'>
       <Form onSubmit = {handleSubmit} className = "d-flex flex-column align-items-center">

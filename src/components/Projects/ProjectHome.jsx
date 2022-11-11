@@ -42,7 +42,7 @@ const ProjectHome = () => {
                 {currentProject.endDate? <span className='text-danger'>{moment(currentProject.endDate).format("MMM-DD-YYYY")}</span>:<span>N/A</span>}
             </span>
             {isDue? <h6>Project Deadline: <Chip color = "error" label = "Due" size = "small"/></h6> : <h6>Project Deadline: <Chip color = "success" label = "Not Due" size = "small"/></h6>}
-            {currentProject.status? <h6>Project Status: <Chip color = "error" label = "Complete" size = "small"/></h6> : <h6>Project Status: <Chip color = "success" label = "Not Complete" size = "small"/></h6>}
+            {currentProject.status? <h6>Project Status: <Chip color = "success" label = "Complete" size = "small"/></h6> : <h6>Project Status: <Chip color = "error" label = "Not Complete" size = "small"/></h6>}
             <SideNavbar/>
         </div>
     )
