@@ -13,7 +13,6 @@ import { acceptInvite, loadCurrentUserData, rejectInvite } from '../reducers/cur
 
 //bootstrap
 import Table from 'react-bootstrap/Table';
-import Card from 'react-bootstrap/Card';
 
 const Home =  () => {
   const currentUserProjectInvites = useSelector(state => state.currentUser.personData.projectInvites)

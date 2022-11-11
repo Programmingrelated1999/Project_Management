@@ -21,7 +21,7 @@ const ListItem = ({item, color}) => {
       <Card.Title>{item.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{isDue? <Chip color = "error" label = "Due" size = "small"/>: <Chip color = "success" label = 'Not Due' size = "small"/>}</Card.Subtitle>
         <Card.Text>{item.description}</Card.Text>
-        <Link to = {`/projects/${item.project.id}`}><Button size = "sm" className = "btn btn-warning">Go To Project<LaunchIcon/></Button></Link>
+        <Link to = {`/projects/${item.project}`}><Button size = "sm" className = "btn btn-warning">Go To Project<LaunchIcon/></Button></Link>
       </Card.Body>
     </Card>
   )

@@ -1,10 +1,12 @@
 import React from 'react'
 import { Container, Card, Button } from 'react-bootstrap'
 import { Chip } from '@mui/material'
+import moment from 'moment';
 
-import "./Column.css"
+import "./Column.css";
 
 const Column = ({name, tasks, bugs, handleForwardClick, handlePreviousClick}) => {
+
   return (        
     <Container className = "my-4 mx-5 kanban-category" id = {name}>
         <h3 className = "kanban-title">{name}</h3>
@@ -13,7 +15,7 @@ const Column = ({name, tasks, bugs, handleForwardClick, handlePreviousClick}) =>
                 <Card style={{ width: '18.5rem' }} className = "kanban-card my-2" key = {task.id}>
                   <Card.Body>
                     <Card.Title>{task.name}</Card.Title>
-                      <Chip label = {`Created on ${task.createdDate}`} color="primary" size="small" />
+                      <Chip label = {`Created on ${moment(task.createdDate).format("MMM-DD-YYYY")}`} color="primary" size="small" />
                       <Card.Text>
                         {task.description}
                       </Card.Text>
@@ -28,7 +30,7 @@ const Column = ({name, tasks, bugs, handleForwardClick, handlePreviousClick}) =>
               <Card style={{ width: '18.5rem' }} className = "kanban-card my-2" key = {bug.id}>
                 <Card.Body>
                   <Card.Title>{bug.name}</Card.Title>
-                  <Chip label = {`Created on ${bug.createdDate}`} color="primary" size="small"/>
+                  <Chip label = {`Created on ${moment(bug.createdDate).format("MMM-DD-YYYY")}`} color="primary" size="small"/>
                   <Card.Text>
                     {bug.description}
                   </Card.Text>

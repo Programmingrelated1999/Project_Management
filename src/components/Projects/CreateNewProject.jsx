@@ -9,8 +9,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loadAllUsersData } from '../../reducers/allUsersReducer';
 import { createANewProject } from '../../reducers/currentProjectReducer';
 import { loadCurrentUserData } from '../../reducers/currentUserReducer';
+import { Calendar } from '@mantine/dates';
 
 import { useNavigate, Navigate} from 'react-router-dom';
+import dayjs from 'dayjs';
 
 import SearchUsersModal from './Modals/SearchUsersModal';
 
@@ -19,6 +21,7 @@ const CreateNewProject = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [invites, setInvites] = useState([]);
+  const [endDate, setEndDate] = useState(null);
 
   const [shouldNotify, setShouldNotify] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('')
@@ -66,6 +69,8 @@ const CreateNewProject = () => {
     setInvites(newInviteList);
   }
 
+  console.log("End Date", endDate);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const invitesList = invites.map((invite) => invite.id);
@@ -83,11 +88,19 @@ const CreateNewProject = () => {
           setShouldNotify(false);
           setNotificationMessage("");
         }, 3000)
-    } else{
+    } else if(!endDate){
+        setShouldNotify(true);
+        setNotificationMessage("End Date Not Selected");
+        setTimeout(() => {
+          setShouldNotify(false);
+          setNotificationMessage("");
+        }, 3000)  
+    }else{
         const projectData = {
           name: name,
           description: description,
-          invites: invitesList
+          invites: invitesList,
+          endDate: endDate
         }
         await createANewProject(projectData);
         const userId = JSON.parse(localStorage.getItem('id'));
@@ -95,6 +108,7 @@ const CreateNewProject = () => {
         setName('');
         setDescription('');
         setInvites([]);
+        setEndDate();
         navigate("/projects")
     }
   }
@@ -129,6 +143,15 @@ const CreateNewProject = () => {
         <MaterialUIButton variant="outlined" color="error" key = {invite.id} onClick = {() => removeInvite(invite.id)}>
           {invite.username} <CancelIcon />
         </MaterialUIButton>)}
+        </div>
+
+        <div>
+          <p>End Date</p>
+          <Calendar
+            value={endDate}
+            onChange={(value) => setEndDate(value)}
+            minDate={new Date()}
+          />
         </div>
 
         <SearchUsersModal showAdd = {showAdd} closeAdd = {closeAdd} addInvite = {addInvite} invites = {invites}/>
