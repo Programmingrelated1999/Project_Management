@@ -145,20 +145,18 @@ const CreateNewProject = () => {
         </MaterialUIButton>)}
         </div>
 
-        <div>
-          <p>End Date</p>
-          <Calendar
-            value={endDate}
-            onChange={(value) => setEndDate(value)}
-            minDate={new Date()}
-          />
-        </div>
-
         <SearchUsersModal showAdd = {showAdd} closeAdd = {closeAdd} addInvite = {addInvite} invites = {invites}/>
-
         <div>
           <Button variant="success" className='buttons-vertical' onClick = {openAdd}>Add Users</Button>
           <br/>
+          <div>
+            <p>Select End Date</p>
+            <Calendar
+              value={endDate}
+              onChange={(value) => setEndDate(value)}
+              minDate={new Date()}
+            />
+          </div>
           <Button variant="success" type="submit" className='buttons-vertical'>Submit</Button>
         </div>
       </Form>

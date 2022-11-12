@@ -15,44 +15,15 @@ const Projects = () => {
    const currentUserProjects = useSelector(state => state.currentUser.personData.projects);
 
    const [searchFilter, setSearchFilter] = useState('');
-   const [creator, setCreator] = useState(false);
-   const [admin, setAdmin] = useState(false);
-   const [developer, setDeveloper] = useState(false);
-   const [client, setClient] = useState(false);
+   const [filteredUserProjects, setFilteredUserProjects] = useState(currentUserProjects);
 
    //Filter functions
    //changeFilter for search bar
    const changeFilter = (event) => {
-    event.preventDefault();
     setSearchFilter(event.target.value);
-   }
-
-   //Creator filter
-   const changeCreator = (event) => {
-    event.preventDefault();
-    let newTruthValue = creator;
-    setCreator(!newTruthValue);
-   }
-
-   //Admin filter
-   const changeAdmin = (event) => {
-    event.preventDefault();
-    let newTruthValue = admin;
-    setAdmin(!newTruthValue);
-   }
-
-   //Developer filter
-   const changeDeveloper = (event) => {
-    event.preventDefault();
-    let newTruthValue = developer;
-    setDeveloper(!newTruthValue);
-   }
-
-   //Client filter
-   const changeClient = (event) => {
-    event.preventDefault();
-    let newTruthValue = client;
-    setClient(!newTruthValue);
+    const newProjectsList = currentUserProjects.filter(project => project.name.includes(event.target.value));
+    console.log("new Porjects List", newProjectsList);
+    setFilteredUserProjects(newProjectsList);
    }
 
     return (
@@ -66,7 +37,7 @@ const Projects = () => {
             <input id = "search-bar" placeholder='Search Your Projects' value = {searchFilter} onChange = {changeFilter}/>
           </div>
           <div className = "project-table py-3">
-            {currentUserProjects.map((project) => <ProjectList key = {project.id} projectId = {project.id} name ={project.name} description = {project.description}/>)}
+            {filteredUserProjects.map((project) => <ProjectList key = {project.id} projectId = {project.id} name ={project.name} description = {project.description}/>)}
           </div>
         </div>
     </>
